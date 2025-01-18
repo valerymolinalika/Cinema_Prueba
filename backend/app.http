@@ -1,0 +1,88 @@
+###Create User 
+post http://localhost:3001/users/
+Content-Type: application/json
+
+{
+    "id": "123421233",
+    "first_name": "Jose Gabriel",
+    "last_name": "Jimenez Vidales",
+    "email": "jose.vidales@correounivalle.edu.co",
+    "phone": "318 234 5678",
+    "available":"TRUE", 
+    "user_password": "123456"
+}
+
+###Get all Users
+get http://localhost:3001/users
+Content-Type: application/json
+
+###Change status of user
+put http://localhost:3001/users/available
+Content-Type: application/json
+
+{
+    "id": "123421233",
+    "available":"TRUE"
+}
+
+### Edit user
+put http://localhost:3001/users/edit/123421233
+Content-Type: application/json
+
+{
+    "first_name": "José Gabriel",
+    "last_name": "Jiménez Vidales",
+    "email": "jose.gabriel@newemail.com",
+    "phone": "123 456 7890",
+    "available": true
+}
+
+###Login
+post http://localhost:3001/users/login
+Content-Type: application/json
+
+{
+    "email": "jose.vidales@correounivalle.edu.co", 
+    "user_password": "123456"
+}
+
+###Get all movies
+get http://localhost:3001/movies
+Content-Type: application/json
+
+### add movie 
+POST http://localhost:3001/movies/add
+Content-Type: application/json
+
+{
+    "title": "Inception 2",
+    "synopsis": "A skilled thief is offered a chance to have his past crimes forgiven if he can successfully perform inception on a target's mind.",
+    "rating": "PG-13",
+    "image_url": "https://images.adsttc.com/media/images/53b5/d563/c07a/80a3/4300/016c/medium_jpg/inception_ver12_xlg.jpg?1404425564",
+    "available":"TRUE", 
+    "administrator_id": 123456789
+}
+
+
+### edit movie 
+POST http://localhost:3001/movies/edit/1
+Content-Type: application/json
+
+{
+    "title": "Inception 3",
+    "synopsis": "A skilled thief is offered a chance to have his past crimes forgiven if he can successfully perform inception on a target's mind.",
+    "rating": "PG-13",
+    "available":"FALSE", 
+    "administrator_id": 123456789
+}
+
+###Add a movie function 
+POST http://localhost:3001/movie_function/add
+Content-Type: application/json
+{
+  "movie_id": 1,
+  "date_function": "2025-01-20",
+  "time_function": "15:30:00",
+  "room_number": 2,
+  "available_seats": ["A1", "A2", "A3", "B1", "B2"]
+}

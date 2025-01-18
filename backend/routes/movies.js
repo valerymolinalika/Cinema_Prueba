@@ -1,0 +1,123 @@
+var express = require('express');
+var bodyParser = require('body-parser');
+var bcrypt = require('bcrypt');
+const upload = require('./upload');
+const { uploadToS3 } = require('./s3Upload');
+const axios = require('axios');
+
+var router = express.Router();
+
+const { pool, connect } = require('./db_pool_connect');
+
+
+//get all movies
+router.get('/', async function  (req, res, next) {
+    try {
+        const getMoviesQuery = `
+            SELECT * FROM movie WHERE available = true
+        `;
+        const users = await pool.query(getMoviesQuery);
+        res.status(200).json(users.rows);
+    }catch (error){
+        console.error('Error while fetching movies:', error);
+        res.status(500).send('Internal Server Error');
+    
+    }
+    
+})
+
+// Ruta para agregar una nueva película
+router.post('/add', async function (req, res, next) {
+    try {
+        const { title, synopsis, rating, image_url, administrator_id } = req.body;
+
+        if (!title || !synopsis || !rating || !administrator_id) {
+            return res.status(400).send('Missing required fields: title, synopsis, rating, administrator_id');
+        }
+
+        const adminCheckQuery = `SELECT id FROM administrator WHERE id = $1`;
+        const adminResult = await pool.query(adminCheckQuery, [administrator_id]);
+
+        if (adminResult.rows.length === 0) {
+            return res.status(404).send('Administrator not found');
+        }
+
+        // Descargar la imagen de la URL proporcionada
+        const imageResponse = await axios.get(image_url, { responseType: 'stream' });
+
+        // Subir la imagen descargada a S3
+        const fileName = `images/${Date.now()}-${title}.jpg`; // Nombre único para cada archivo
+        const s3Result = await uploadToS3(imageResponse.data, fileName);
+
+        // Insertar la película en la base de datos con la URL de S3
+        const insertMovieQuery = `
+            INSERT INTO movie (title, synopsis, rating, image_url, administrator_id)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING *;
+        `;
+        const newMovie = await pool.query(insertMovieQuery, [title, synopsis, rating, s3Result, administrator_id]);
+
+        res.status(201).json({
+            message: 'Movie added successfully',
+            movie: newMovie.rows[0],
+        });
+    } catch (error) {
+        console.error('Error while adding movie:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// Ruta para editar una película
+router.put('/edit/:id', async function (req, res, next) {
+    try {
+        const { id } = req.params; // ID de la película a editar
+        const { title, synopsis, rating, image_url } = req.body;
+
+        const movieCheckQuery = `SELECT * FROM movie WHERE id = $1`;
+        const movieResult = await pool.query(movieCheckQuery, [id]);
+
+        if (movieResult.rows.length === 0) {
+            return res.status(404).send('Movie not found');
+        }
+
+        // Si se pasa una nueva imagen, se sube a S3
+        let updatedImageUrl = movieResult.rows[0].image_url; // Mantener la URL actual si no se pasa una nueva
+
+        if (image_url) {
+            const imageResponse = await axios.get(image_url, { responseType: 'stream' });
+
+            const fileName = `images/${Date.now()}-${title}.jpg`; 
+            const s3Result = await uploadToS3(imageResponse.data, fileName);
+            updatedImageUrl = s3Result;
+        }
+
+        const updateMovieQuery = `
+            UPDATE movie
+            SET
+                title = COALESCE($1, title),
+                synopsis = COALESCE($2, synopsis),
+                rating = COALESCE($3, rating),
+                image_url = $4
+            WHERE id = $5
+            RETURNING *;
+        `;
+
+        const updatedMovie = await pool.query(updateMovieQuery, [
+            title,
+            synopsis,
+            rating,
+            updatedImageUrl,
+            id,
+        ]);
+
+        res.status(200).json({
+            message: 'Movie updated successfully',
+            movie: updatedMovie.rows[0],
+        });
+    } catch (error) {
+        console.error('Error while updating movie:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+module.exports = router;
