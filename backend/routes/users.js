@@ -6,7 +6,7 @@ var router = express.Router();
 
 const { pool, connect } = require('./db_pool_connect');
 
-router.post('/', async function (req, res, next) {
+router.post('/register', async function (req, res, next) {
     try {
         const { id, first_name, last_name, email, phone, available, user_password } = req.body;
 

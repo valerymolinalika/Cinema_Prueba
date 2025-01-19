@@ -1,5 +1,5 @@
 ###Create User 
-post http://localhost:3001/users/
+post http://localhost:3001/users/register
 Content-Type: application/json
 
 {
@@ -51,38 +51,45 @@ get http://localhost:3001/movies
 Content-Type: application/json
 
 ### add movie 
-POST http://localhost:3001/movies/add
+post http://localhost:3001/movies/add
 Content-Type: application/json
 
 {
-    "title": "Inception 2",
+    "title": "Inception 1",
     "synopsis": "A skilled thief is offered a chance to have his past crimes forgiven if he can successfully perform inception on a target's mind.",
     "rating": "PG-13",
     "image_url": "https://images.adsttc.com/media/images/53b5/d563/c07a/80a3/4300/016c/medium_jpg/inception_ver12_xlg.jpg?1404425564",
     "available":"TRUE", 
+    "genre": "sci-fi",
     "administrator_id": 123456789
 }
 
 
 ### edit movie 
-POST http://localhost:3001/movies/edit/1
+put http://localhost:3001/movies/edit/3
 Content-Type: application/json
 
 {
     "title": "Inception 3",
     "synopsis": "A skilled thief is offered a chance to have his past crimes forgiven if he can successfully perform inception on a target's mind.",
-    "rating": "PG-13",
-    "available":"FALSE", 
+    "rating": "PG-15",
+    "available":"TRUE", 
+    "genre": "sci-fi",
     "administrator_id": 123456789
 }
 
 ###Add a movie function 
-POST http://localhost:3001/movie_function/add
+post http://localhost:3001/movie_function/add
 Content-Type: application/json
+
 {
-  "movie_id": 1,
+  "movie_id": 3,
   "date_function": "2025-01-20",
   "time_function": "15:30:00",
-  "room_number": 2,
+  "room_number": 5,
   "available_seats": ["A1", "A2", "A3", "B1", "B2"]
 }
+
+###Get all movie functions
+get http://localhost:3001/movie_function/movie/3
+Content-Type: application/json

@@ -11,25 +11,25 @@ const { pool, connect } = require('./db_pool_connect');
 
 
 //get all movies
-router.get('/', async function  (req, res, next) {
+router.get('/', async function (req, res, next) {
     try {
         const getMoviesQuery = `
-            SELECT * FROM movie WHERE available = true
+            SELECT id, title, synopsis, rating, image_url, genre
+            FROM movies
+            WHERE available = true
         `;
-        const users = await pool.query(getMoviesQuery);
-        res.status(200).json(users.rows);
-    }catch (error){
+        const movies = await pool.query(getMoviesQuery);
+        res.status(200).json(movies.rows);
+    } catch (error) {
         console.error('Error while fetching movies:', error);
         res.status(500).send('Internal Server Error');
-    
     }
-    
-})
+});
 
 // Ruta para agregar una nueva película
 router.post('/add', async function (req, res, next) {
     try {
-        const { title, synopsis, rating, image_url, administrator_id } = req.body;
+        const { title, synopsis, rating, image_url, available, genre, administrator_id } = req.body;
 
         if (!title || !synopsis || !rating || !administrator_id) {
             return res.status(400).send('Missing required fields: title, synopsis, rating, administrator_id');
@@ -51,11 +51,11 @@ router.post('/add', async function (req, res, next) {
 
         // Insertar la película en la base de datos con la URL de S3
         const insertMovieQuery = `
-            INSERT INTO movie (title, synopsis, rating, image_url, administrator_id)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO movies (title, synopsis, rating, image_url, available, genre, administrator_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING *;
         `;
-        const newMovie = await pool.query(insertMovieQuery, [title, synopsis, rating, s3Result, administrator_id]);
+        const newMovie = await pool.query(insertMovieQuery, [title, synopsis, rating, s3Result, available, genre, administrator_id]);
 
         res.status(201).json({
             message: 'Movie added successfully',
@@ -71,9 +71,9 @@ router.post('/add', async function (req, res, next) {
 router.put('/edit/:id', async function (req, res, next) {
     try {
         const { id } = req.params; // ID de la película a editar
-        const { title, synopsis, rating, image_url } = req.body;
+        const { title, synopsis, rating, image_url,available, genre } = req.body;
 
-        const movieCheckQuery = `SELECT * FROM movie WHERE id = $1`;
+        const movieCheckQuery = `SELECT * FROM movies WHERE id = $1`;
         const movieResult = await pool.query(movieCheckQuery, [id]);
 
         if (movieResult.rows.length === 0) {
@@ -92,13 +92,15 @@ router.put('/edit/:id', async function (req, res, next) {
         }
 
         const updateMovieQuery = `
-            UPDATE movie
+            UPDATE movies
             SET
                 title = COALESCE($1, title),
                 synopsis = COALESCE($2, synopsis),
                 rating = COALESCE($3, rating),
-                image_url = $4
-            WHERE id = $5
+                image_url = $4,
+                available = COALESCE($5, available),
+                genre = COALESCE($6, genre)
+            WHERE id = $7
             RETURNING *;
         `;
 
@@ -107,6 +109,8 @@ router.put('/edit/:id', async function (req, res, next) {
             synopsis,
             rating,
             updatedImageUrl,
+            available,
+            genre,
             id,
         ]);
 
