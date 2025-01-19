@@ -49,24 +49,59 @@ router.post('/add', async (req, res) => {
     }
 });
 
-// Ruta para obtener todas las funciones de una película por su ID
-router.get('/movie/:movie_id', async (req, res) => {
-    const { movie_id } = req.params;
+
+// Ruta para obtener todas las fechas de funciones de una película
+router.get('/movie/dates', async (req, res) => {
+    const { movie_id } = req.query; // Usamos req.query en lugar de req.body para GET
 
     if (!movie_id) {
-        return res.status(400).send('Missing required parameter: movie_id');
+        return res.status(400).json({ error: { message: 'Missing required parameter: movie_id', status: 400 } });
     }
+
     try {
-        const getFunctionsQuery = `
-            SELECT * 
-            FROM movie_function 
+        const getDatesQuery = `
+            SELECT DISTINCT date_function
+            FROM movie_function
             WHERE movie_id = $1;
         `;
 
-        const result = await pool.query(getFunctionsQuery, [movie_id]);
+        const result = await pool.query(getDatesQuery, [movie_id]);
 
         if (result.rows.length === 0) {
-            return res.status(404).send('No functions found for the given movie ID');
+            return res.status(404).json({ error: { message: 'No function dates found for the given movie ID', status: 404 } });
+        }
+
+        // Respuesta exitosa
+        res.status(200).json({
+            message: 'Function dates retrieved successfully',
+            dates: result.rows,
+        });
+    } catch (error) {
+        console.error('Error while fetching function dates:', error); // Log para depuración
+        res.status(500).json({ error: { message: 'Internal Server Error', status: 500 } });
+    }
+});
+
+
+// Ruta para obtener todas las funciones de una película por su ID y fecha
+router.get('/functions', async (req, res) => {
+    const { movie_id, date_function } = req.query;
+
+    if (!movie_id || !date_function) {
+        return res.status(400).json({ error: { message: 'Missing required parameters: movie_id and/or date_function', status: 400 } });
+    }
+
+    try {
+        const getFunctionsQuery = `
+            SELECT *
+            FROM movie_function
+            WHERE movie_id = $1 AND date_function = $2;
+        `;
+
+        const result = await pool.query(getFunctionsQuery, [movie_id, date_function]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: { message: 'No functions found for the given movie ID and date_function', status: 404 } });
         }
 
         res.status(200).json({
@@ -75,10 +110,8 @@ router.get('/movie/:movie_id', async (req, res) => {
         });
     } catch (error) {
         console.error('Error while fetching movie functions:', error);
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ error: { message: 'Internal Server Error', status: 500 } });
     }
 });
-
-
 
 module.exports = router;
