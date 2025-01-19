@@ -3,10 +3,10 @@ post http://localhost:3001/users/register
 Content-Type: application/json
 
 {
-    "id": "123421233",
-    "first_name": "Jose Gabriel",
-    "last_name": "Jimenez Vidales",
-    "email": "jose.vidales@correounivalle.edu.co",
+    "id": "12345678",
+    "first_name": "Valery",
+    "last_name": "Molina",
+    "email": "valery.molina@correounivalle.edu.co",
     "phone": "318 234 5678",
     "available":"TRUE", 
     "user_password": "123456"
@@ -83,13 +83,29 @@ post http://localhost:3001/movie_function/add
 Content-Type: application/json
 
 {
-  "movie_id": 3,
-  "date_function": "2025-01-20",
-  "time_function": "15:30:00",
-  "room_number": 5,
+  "movie_id": 1,
+  "date_function": "2025-01-21",
+  "time_function": "12:30:00",
+  "room_number": 8,
   "available_seats": ["A1", "A2", "A3", "B1", "B2"]
 }
 
-###Get all movie functions
-get http://localhost:3001/movie_function/movie/3
+###Get all dates movie functions
+get http://localhost:3001/movie_function/movie/dates?movie_id=1
 Content-Type: application/json
+
+
+###Get all movie functions
+get http://localhost:3001/movie_function//functions?movie_id=1&date_function=2025-01-21
+Content-Type: application/json
+
+###Buying cinema tickets 
+post http://localhost:3001/invoice/buy-ticket
+Content-Type: application/json
+
+{
+  "user_id": "12345678",
+  "function_id": 3,
+  "seats": ["A3"],
+  "price_per_ticket": 10000
+}

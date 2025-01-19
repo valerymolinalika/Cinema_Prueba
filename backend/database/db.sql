@@ -40,7 +40,7 @@ CREATE TABLE movie_function (
   date_function DATE NOT NULL,
   time_function TIME NOT NULL,
   room_number INT NOT NULL,
-  available_seats TEXT[] NOT NULL, -- Almacena un array de asientos, e.g., {A1, A2, B1, B2}
+  available_seats VARCHAR[] NOT NULL, -- Almacena un array de asientos, e.g., {A1, A2, B1, B2}
   FOREIGN KEY (movie_id) REFERENCES movies(id)
 );
 
@@ -48,7 +48,7 @@ CREATE TABLE movie_function (
 CREATE TABLE invoice (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Using UUID here
   total DECIMAL(10, 2) NOT NULL, 
-  date DATE NOT NULL,            
+  date_invoice DATE NOT NULL,            
   ticket_count INT NOT NULL      
 );
 
@@ -66,18 +66,19 @@ CREATE TABLE ticket (
 );
 
 -- ---------------------------------------------------------------------
--- Function to update available seats
+-- Función para actualizar los asientos disponibles
 CREATE OR REPLACE FUNCTION update_available_seats()
 RETURNS TRIGGER AS $$ 
 BEGIN 
-  -- Remove the purchased seat from the array of available seats 
+  -- Eliminar el asiento comprado del array de asientos disponibles
   UPDATE movie_function 
-  SET available_seats = array_remove(available_seats, NEW.seat) 
-  WHERE id = NEW.function_id; -- Changed to match INT function_id
+  SET available_seats = array_remove(available_seats::VARCHAR[], NEW.seat)  -- Convertir a VARCHAR[]
+  WHERE id = NEW.function_id; -- Cambiado para coincidir con el id INT de la función
 
   RETURN NEW; 
 END; 
 $$ LANGUAGE plpgsql;
+
 
 -- Trigger to call the function after a new ticket is inserted
 CREATE TRIGGER update_available_seats_trigger
