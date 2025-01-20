@@ -1,0 +1,39 @@
+<div class="p-6 bg-white">
+  <div class="flex space-x-6">
+    <!-- Div izquierdo (Información de la película) -->
+    <div class="flex-1">
+      <img [src]="movie().image_url" [alt]="movie().title" class="w-1/4 h-auto rounded-lg mx-auto" />
+      <h1 class="text-3xl font-bold mb-4">{{ movie().title }}</h1>
+      <p class="text-lg text-gray-700 mb-2"><strong>Genre:</strong> {{ movie().genre }}</p>
+      <p class="text-lg text-gray-700 mb-2"><strong>Rating:</strong> {{ movie().rating }}</p>
+      <p class="text-lg text-gray-700 mb-4"><strong>Synopsis:</strong> {{ movie().synopsis }}</p>
+    </div>
+
+    <!-- Div derecho (Fechas y funciones de la película) -->
+    <div class="flex-1">
+      <!-- Mostrar botones de fechas -->
+      <div class="flex space-x-4 mb-6">
+        <button *ngFor="let date of dates" 
+                (click)="onDateSelected(date)" 
+                class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-700">
+          {{ date }}
+        </button>
+      </div>
+
+      <!-- Mostrar las horas de las funciones para la fecha seleccionada -->
+      <div *ngIf="functions.length > 0 && selectedDate" class="mt-4">
+        <h2 class="text-2xl font-bold mb-4">Available Functions for {{ selectedDate }}</h2>
+        <div class="space-y-4">
+          <div *ngFor="let func of functions">
+            <div class="bg-gray-100 p-4 rounded-lg shadow-md">
+              <p><strong>Time:</strong> {{ func.time_function }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Componente Cine -->
+      <app-cine [inputRows]="numRow" [inputCols]="numCol"></app-cine>
+    </div>
+  </div>
+</div>

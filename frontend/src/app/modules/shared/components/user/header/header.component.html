@@ -1,0 +1,27 @@
+<div class="w-full bg-customBlue">
+  <div class="max-w-screen-xl flex items-center justify-between mx-auto py-4 px-4">
+    <div class="flex items-center space-x-2">
+      <img src="images/logo.png" alt="Cinema Logo" class="w-40 h-35">
+    </div>
+
+    <div class="flex items-center space-x-4">
+      <!-- Si no hay usuario conectado, muestra Login/Register -->
+      <ng-container *ngIf="!currentUser(); else userInfo">
+        <button (click)="setLogin()" class="text-white text-lg font-medium hover:underline transition">
+          Login
+        </button>
+        <button (click)="setRegister()" class="text-white text-lg font-medium hover:underline transition">
+          Register
+        </button>
+      </ng-container>
+
+      <!-- Si hay un usuario conectado, muestra saludo y botón de Logout -->
+      <ng-template #userInfo>
+        <span class="text-white text-lg">Hola, {{ currentUser()?.first_name || 'Usuario' }}</span>
+        <button (click)="logout()" class="text-white text-lg font-medium hover:underline transition">
+          Logout
+        </button>
+      </ng-template>
+    </div>
+  </div>
+</div>

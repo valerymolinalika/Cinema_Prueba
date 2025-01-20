@@ -1,0 +1,61 @@
+<div class="flex justify-center min-h-screen">
+    <div
+        class="relative w-full max-h-fit max-w-sm p-3 bg-white border border-gray-200 rounded-lg shadow sm:p-4 md:p-6 dark:bg-customBlue dark:border-gray-700">
+        <div
+            class="absolute top-1 right-1 flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white cursor-pointer hover:bg-red-600">
+            <i (click)="setRegister()" class="pi pi-times"></i>
+        </div>
+        <form class="space-y-4" action="#">
+            <h5 class="text-lg font-medium text-gray-900 dark:text-white">Create your account</h5>
+            
+            <div>
+                <label for="id" class="block mb-1 text-xs font-medium text-gray-900 dark:text-white">ID</label>
+                <input type="text" [value]="id()" (change)="changeId($event)" name="id" id="id"
+                    class="bg-custombluegrey border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-custombluegrey dark:border-gray-500 dark:placeholder-customDarkgrey dark:text-black"
+                    placeholder="12359849" required />
+            </div>
+
+            <div>
+                <label for="first_name" class="block mb-1 text-xs font-medium text-gray-900 dark:text-white">First name</label>
+                <input type="text" [value]="first_name()" (change)="changeFirstName($event)" name="first_name" id="first_name"
+                    class="bg-custombluegrey border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-custombluegrey dark:border-gray-500 dark:placeholder-customDarkgrey dark:text-black"
+                    placeholder="John" required />
+            </div>
+            
+            <div>
+                <label for="last_name" class="block mb-1 text-xs font-medium text-gray-900 dark:text-white">Last name</label>
+                <input type="text" [value]="last_name()" (change)="changeLastName($event)" name="last_name" id="last_name"
+                    class="bg-custombluegrey border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-custombluegrey dark:border-gray-500 dark:placeholder-customDarkgrey dark:text-black"
+                    placeholder="Doe" required />
+            </div>
+
+            <div>
+                <label for="email" class="block mb-1 text-xs font-medium text-gray-900 dark:text-white">Email</label>
+                <input type="email" [value]="email()" (change)="changeEmail($event)" name="email" id="email"
+                    class="bg-custombluegrey border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-custombluegrey dark:border-gray-500 dark:placeholder-customDarkgrey dark:text-black"
+                    placeholder="name@company.com" required />
+            </div>
+
+            <div>
+                <label for="phone" class="block mb-1 text-xs font-medium text-gray-900 dark:text-white">Phone number</label>
+                <input type="tel" [value]="phone()" (change)="changePhone($event)" name="phone" id="phone"
+                    class="bg-custombluegrey border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-custombluegrey dark:border-gray-500 dark:placeholder-customDarkgrey dark:text-black"
+                    placeholder="+1234567890" required />
+            </div>
+            
+            <div>
+                <label for="password" class="block mb-1 text-xs font-medium text-gray-900 dark:text-white">Password</label>
+                <input type="password" [value]="password()" (change)="changePassword($event)" name="password" id="password"
+                    placeholder="••••••••"
+                    class="bg-custombluegrey border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-custombluegrey dark:border-gray-500 dark:placeholder-customDarkgrey dark:text-black"
+                    required />
+            </div>
+
+            <button (click)="register()" type="submit"
+                class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs px-4 py-2 text-center dark:bg-customRed dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                Register account
+            </button>
+            
+        </form>
+    </div>
+</div>
