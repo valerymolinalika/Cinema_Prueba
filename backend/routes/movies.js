@@ -26,6 +26,28 @@ router.get('/', async function (req, res, next) {
     }
 });
 
+//get movie by id
+router.get('/:id', async function (req, res, next) {
+    try {
+        const { id } = req.params;
+        const getMovieQuery = `
+            SELECT id, title, synopsis, rating, image_url, genre
+            FROM movies
+            WHERE id = $1
+        `;
+        const movie = await pool.query(getMovieQuery, [id]);
+
+        if (movie.rows.length === 0) {
+            return res.status(404).send('Movie not found');
+        }
+
+        res.status(200).json(movie.rows[0]);
+    } catch (error) {
+        console.error('Error while fetching movie:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 // Ruta para agregar una nueva película
 router.post('/add', async function (req, res, next) {
     try {
@@ -42,14 +64,11 @@ router.post('/add', async function (req, res, next) {
             return res.status(404).send('Administrator not found');
         }
 
-        // Descargar la imagen de la URL proporcionada
         const imageResponse = await axios.get(image_url, { responseType: 'stream' });
 
-        // Subir la imagen descargada a S3
         const fileName = `images/${Date.now()}-${title}.jpg`; // Nombre único para cada archivo
         const s3Result = await uploadToS3(imageResponse.data, fileName);
 
-        // Insertar la película en la base de datos con la URL de S3
         const insertMovieQuery = `
             INSERT INTO movies (title, synopsis, rating, image_url, available, genre, administrator_id)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -80,7 +99,6 @@ router.put('/edit/:id', async function (req, res, next) {
             return res.status(404).send('Movie not found');
         }
 
-        // Si se pasa una nueva imagen, se sube a S3
         let updatedImageUrl = movieResult.rows[0].image_url; // Mantener la URL actual si no se pasa una nueva
 
         if (image_url) {
