@@ -3,6 +3,7 @@ import { HomeComponent } from '@info/pages/home/home.component';
 import { LayoutComponent } from '@user/layout/layout.component';
 import { InfoMovieComponent } from '@info/pages/info-movie/info-movie.component';
 import { CineComponent } from '@user/cine/cine.component';
+import { AdminComponent } from '@info/pages/admin/admin.component';
 
 export const routes: Routes = [
 
@@ -27,6 +28,18 @@ export const routes: Routes = [
             },
             
         ]
+    }, 
+    {
+        path: 'admin',
+        component: LayoutComponent,
+        children:[
+            {
+                path: '',
+                component: AdminComponent
+            },
+            
+        ]
+
     }
 
 ];

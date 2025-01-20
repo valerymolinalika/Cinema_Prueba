@@ -9,7 +9,8 @@ module.exports = {
         customGrey: '#f6f6f6',
         customRed: '#ff4f55',
         custombluegrey: '#b7c1e2',
-        customDarkgrey: '#2a3759'
+        customDarkgrey: '#2a3759',
+        customDarkred: '#dc4e57'
       },
     },
   },

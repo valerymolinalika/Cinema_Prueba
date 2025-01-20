@@ -66,11 +66,16 @@ export class InfoMovieComponent {
   async onDateSelected(date: string) {
     this.selectedDate = date; // Actualizamos la fecha seleccionada
     try {
-       const functions = await this.movieService.getFunctionsByDate(Number(this.movie().id), date);
-      this.functions = functions;
+      const functions = await this.movieService.getFunctionsByDate(Number(this.movie().id), date);
+      // Formatear las horas de las funciones
+      this.functions = functions.map(func => ({
+        ...func,
+        time_function: func.time_function.substring(0, 5) // Tomar solo "HH:mm"
+      }));
       console.log('Functions for selected date:', this.functions);
     } catch (error) {
       console.error('Error fetching functions for selected date:', error);
     }
   }
+  
 }

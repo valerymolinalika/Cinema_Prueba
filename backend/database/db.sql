@@ -70,10 +70,10 @@ CREATE TABLE ticket (
 CREATE OR REPLACE FUNCTION update_available_seats()
 RETURNS TRIGGER AS $$ 
 BEGIN 
-  -- Eliminar el asiento comprado del array de asientos disponibles
+  
   UPDATE movie_function 
-  SET available_seats = array_remove(available_seats::VARCHAR[], NEW.seat)  -- Convertir a VARCHAR[]
-  WHERE id = NEW.function_id; -- Cambiado para coincidir con el id INT de la función
+  SET available_seats = array_remove(available_seats::VARCHAR[], NEW.seat)  
+  WHERE id = NEW.function_id; 
 
   RETURN NEW; 
 END; 
