@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { PurchaseService } from '../../../services/purchase.service';
-import { Purchase } from '../../../models/purchase.model';
+import { Purchase } from '../../../models/purchase.models';
 
 @Component({
   selector: 'app-purchases-list',

@@ -135,32 +135,45 @@ router.post('/login', async function (req, res, next) {
         if (!email || !user_password) {
             return res.status(400).send('Missing required fields: email and user_password');
         }
-
-        const getUserQuery = `
+        let isAdmin = false;
+        let getUserQuery = ``
+        if (email === 'admin@gmail.com') {
+            getUserQuery = `
+            SELECT id, first_name, last_name, email, admin_password
+            FROM administrator
+            WHERE email = $1
+        `;
+            isAdmin = true;
+        } else {
+            getUserQuery = `
             SELECT id, first_name, last_name, email, phone, available, user_password
             FROM users
             WHERE email = $1
         `;
+        }
         const result = await pool.query(getUserQuery, [email]);
 
         if (result.rows.length === 0) {
             return res.status(404).send('User not found');
         }
-
         const user = result.rows[0];
-
-        if (!user.available) {
+        if (!user.available && !isAdmin) {
             return res.status(403).send('User is not available to log in');
         }
+        let isPasswordValid = false;
 
-        const isPasswordValid = await bcrypt.compare(user_password, user.user_password);
+        if (isAdmin) {
+            isPasswordValid = await bcrypt.compare(user_password, user.admin_password);
+        } else {
+            isPasswordValid = await bcrypt.compare(user_password, user.user_password);
+        }
 
         if (!isPasswordValid) {
             return res.status(401).send('Invalid credentials');
         }
 
         const { id, first_name, last_name, phone } = user;
-        res.status(200).json({ id, first_name, last_name, email, phone, available: user.available });
+        res.status(200).json({ id, first_name, last_name, email, phone, available: user.available, isAdmin });
     } catch (error) {
         console.error('Error while validating user:', error);
         res.status(500).send('Internal Server Error');

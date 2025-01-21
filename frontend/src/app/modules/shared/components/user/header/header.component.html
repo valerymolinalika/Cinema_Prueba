@@ -5,8 +5,8 @@
         <img src="images/logo.png" alt="Cinema Logo" class="w-40 h-35">
       </a>
     </div>
-
     <div class="flex items-center space-x-4">
+      <!-- <ng-container *ngIf="!localStorageUser()"> -->
       <ng-container *ngIf="!userExists(); else userInfo">
         <button (click)="setLogin()" class="text-white text-lg font-medium hover:underline transition">
           Login
@@ -17,15 +17,16 @@
       </ng-container>
 
       <ng-template #userInfo>
+        <!-- <span class="text-white text-lg">Hola, {{ localStorageUser?.first_name || 'Usuario' }}</span> -->
         <span class="text-white text-lg">Hola, {{ currentUserValue()?.first_name || 'Usuario' }}</span>
-        <button (click)="logout()" class="text-white text-lg font-medium hover:underline transition">
+        <a [routerLink]="['']" (click)="logout()" class="text-white text-lg font-medium hover:underline transition">
           Logout
-        </button>
+        </a>
       </ng-template>
     </div>
   </div>
 
-  
+
   @if(showLogin) {
     <div class="fixed inset-0 pt-20 flex items-center justify-center z-50">
         <div class="w-96 bg-transparent p-6">

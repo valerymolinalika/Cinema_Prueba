@@ -1,23 +1,23 @@
 import { Injectable } from '@angular/core';
 import axios from 'axios';
-import { Movie } from './../models/movie.models';  
+import { Movie } from './../models/movie.models';
 import { MovieFunction } from '../models/movie_function.models';
-import { parse, format } from 'date-fns'; 
+import { parse, format } from 'date-fns';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MovieService {
-  private apiUrl = 'http://localhost:3001';  
+  private apiUrl = 'http://localhost:3001';
 
-  constructor() {}
+  constructor() { }
   async getMovies(): Promise<Movie[]> {
     try {
       const response = await axios.get(`${this.apiUrl}/movies`);
-      return response.data;  
+      return response.data;
     } catch (error) {
       console.error('Error getting the films:', error);
-      throw error;  
+      throw error;
     }
   }
 
@@ -44,7 +44,7 @@ export class MovieService {
   async getDatesFunctions(movieId: number): Promise<string[]> {
     try {
       const response = await axios.get(`${this.apiUrl}/movie_function/movie/dates`, {
-        params: { movie_id: movieId }, 
+        params: { movie_id: movieId },
       });
       console.log('Dates retrieved:', response.data.dates);
       return response.data.dates.map((dateObj: { date_function: string }) => {
@@ -60,7 +60,7 @@ export class MovieService {
   async getFunctionsByDate(movieId: number, date: string): Promise<MovieFunction[]> {
     try {
       console.log('Getting functions for movie:', movieId, 'and date:', date);
-  
+
       // Convertir la fecha en formato '22 ene' a formato '2025-01-22'
       const monthMap: { [key: string]: string } = {
         'ene': '01',
@@ -76,22 +76,22 @@ export class MovieService {
         'nov': '11',
         'dic': '12'
       };
-  
+
       const [day, month] = date.split(' ');
-  
+
       const formattedDate = `2025-${monthMap[month]}-${day.padStart(2, '0')}`;
-  
+
       const isoDate = new Date(formattedDate);
       if (isNaN(isoDate.getTime())) {
         throw new Error('Invalid date format');
       }
-  
+
       console.log('ISO date:', isoDate.toISOString());
-  
+
       const response = await axios.get(`${this.apiUrl}/movie_function/functions`, {
-        params: { movie_id: movieId, date_function: isoDate.toISOString().split('T')[0] }, 
+        params: { movie_id: movieId, date_function: isoDate.toISOString().split('T')[0] },
       });
-  
+
       console.log('Functions retrieved:', response.data.functions);
       return response.data.functions;
     } catch (error) {
@@ -99,7 +99,7 @@ export class MovieService {
       throw error;
     }
   }
-  
+
   async updateUserAvailability(id: number, available: boolean): Promise<string> {
     try {
       const response = await axios.put(`${this.apiUrl}/movies/available`, {
@@ -107,7 +107,7 @@ export class MovieService {
         available,
       });
       console.log('Movie availability updated:', response.data);
-      return response.data; 
+      return response.data;
     } catch (error: any) {
       console.error(
         'Error while updating user availability:',
@@ -116,18 +116,27 @@ export class MovieService {
       throw new Error(
         error.response?.data || 'Error while updating user availability'
       );
-    } 
-}
-
- // Crear una nueva función de película
- async createMovieFunction(movieFunction: MovieFunction): Promise<MovieFunction> {
-  try {
-    const response = await axios.post(`${this.apiUrl}/movie_function/add`, movieFunction);
-    console.log('Movie function created:', response.data);
-    return response.data.function; // Devuelve la función de película creada
-  } catch (error) {
-    console.error('Error creating movie function:', error);
-    throw error;
+    }
   }
-}
+
+  async createMovieFunction(movieFunction: MovieFunction): Promise<MovieFunction> {
+    try {
+      const response = await axios.post(`${this.apiUrl}/movie_function/add`, movieFunction);
+      console.log('Movie function created:', response.data);
+      return response.data.function; // Devuelve la función de película creada
+    } catch (error) {
+      console.error('Error creating movie function:', error);
+      throw error;
+    }
+  }
+
+  // async editMovie (movie: Movie): Promise<Movie>{
+  //   try {
+  //     const response = await axios.put(`${this.apiUrl}/movies/${id}`)
+
+  //   }catch (error) {
+  //     console.error('Error editing movie:', error);
+  //     throw error;
+  // }
+
 }

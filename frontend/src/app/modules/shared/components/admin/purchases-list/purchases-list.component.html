@@ -12,7 +12,6 @@
           <th scope="col" class="px-6 py-3">Movie Title</th>
           <th scope="col" class="px-6 py-3">Function Date</th>
           <th scope="col" class="px-6 py-3">Function Time</th>
-          <th scope="col" class="px-6 py-3">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -35,12 +34,7 @@
           <td class="px-6 py-4">{{ purchase.movie_title }}</td>
           <td class="px-6 py-4">{{ purchase.function_date | date: 'shortDate' }}</td>
           <td class="px-6 py-4">{{ purchase.function_time }}</td>
-          <td class="px-6 py-4">
-            <button
-              class="px-4 py-2 text-white bg-customBlue hover:bg-customDarkgrey rounded">
-              View Details
-            </button>
-          </td>
+          
         </tr>
       </tbody>
     </table>

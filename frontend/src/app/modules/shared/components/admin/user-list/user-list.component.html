@@ -8,7 +8,6 @@
                 <th scope="col" class="px-6 py-3">Email</th>
                 <th scope="col" class="px-6 py-3">Phone</th>
                 <th scope="col" class="px-6 py-3">Available</th>
-                <th scope="col" class="px-6 py-3">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -30,12 +29,6 @@
                         (click)="toggleAvailability(user)">
                         {{ user.available ? 'Yes' : 'No' }}
                     </span>
-                </td>
-                <td class="px-6 py-4">
-                    <button
-                        class="px-4 py-2 text-white bg-customBlue hover:bg-customDarkgrey rounded">
-                        Edit
-                    </button>
                 </td>
             </tr>
         </tbody>

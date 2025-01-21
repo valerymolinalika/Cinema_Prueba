@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
 })
 export class LoginComponent {
   private userService = inject(UserService);
-
+  
   setLogin() {
     this.userService.changeLoginActive();
   }
@@ -40,12 +40,19 @@ export class LoginComponent {
         this.userService.changeCurrentUser(user)
         console.log("currentUser", this.userService.getCurrentUser())
         console.log('Login successful!');
-        this.userService.changeLoginActive();
+        this.userService.changeIsAdministrator(user.isAdmin)
+        localStorage.setItem('user', JSON.stringify(user));
+        if (user.isAdmin) {
+          window.location.href = '/admin';
+          console.log('Administrator logged in');
+        }else{
+          window.location.href = '/';
+        }
+
       })
       .catch((error) => {
         console.error('Login failed:', error.message);
-        // alert('Login failed. Please check your credentials.');
-      });
+       });
   }
 
 

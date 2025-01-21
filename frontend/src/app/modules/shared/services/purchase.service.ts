@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import axios from 'axios';
-import { Purchase } from "../models/purchase.model";
-import { invoice } from "../models/invoice.model";
+import { Purchase } from "../models/purchase.models";
+import { invoice } from "../models/invoice.models";
 
 
 

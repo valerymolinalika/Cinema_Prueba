@@ -11,14 +11,16 @@ import { RouterLink } from '@angular/router';
   imports: [FormsModule, RouterLink]
 })
 export class CineComponent {
-  @Input({required: true}) inputRows: number = 4;
-  @Input({required: true}) inputCols: number = 4;
+  @Input({ required: true }) inputRows: number = 4;
+  @Input({ required: true }) inputCols: number = 4;
+  @Input({ required: true }) inputAvailableSeats: string[] = [];
   @ViewChild('paymentForm') paymentForm!: NgForm;
 
   // Seats signals
   rows = signal(this.inputRows);
   cols = signal(this.inputCols);
   availableSeats = signal(1);
+  availableSeatsList = signal(this.inputAvailableSeats);
   selectedSeats = signal<Set<string>>(new Set());
   maxSeats = computed(() => this.rows() * this.cols());
   showMaxSeatsError = signal(false);
@@ -34,6 +36,7 @@ export class CineComponent {
 
   // Computed
   selectedSeatsCount = computed(() => this.selectedSeats().size);
+  availableSeatsCount = computed(() => this.availableSeatsList().length);
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['inputRows']) {
@@ -41,6 +44,9 @@ export class CineComponent {
     }
     if (changes['inputCols']) {
       this.cols.set(this.inputCols);
+    }
+    if (changes['inputAvailableSeats']) {
+      this.availableSeatsList.set(this.inputAvailableSeats);
     }
   }
 
@@ -54,16 +60,20 @@ export class CineComponent {
   }
 
   selectSeat(row: number, col: number): void {
+    if (this.isSeatUnavailable(row, col)) {
+      return
+    }
+
     const seatId = `${row}-${col}`;
     const currentSeats = new Set(this.selectedSeats());
-    
+
     if (this.isSelected(row, col)) {
       currentSeats.delete(seatId);
       this.selectedSeats.set(currentSeats);
 
       return
     }
-    
+
     if (this.canSelectMoreSeats()) {
       currentSeats.add(seatId);
       this.selectedSeats.set(currentSeats);
@@ -79,7 +89,9 @@ export class CineComponent {
   }
 
   validateSeatsInput(): void {
-    this.showMaxSeatsError.set(this.availableSeats() > this.maxSeats());
+    this.showMaxSeatsError.set(
+      this.availableSeats() > this.availableSeatsCount()
+    );
     this.selectedSeats.set(new Set());
   }
 
@@ -94,7 +106,7 @@ export class CineComponent {
   openPaymentModal(): void {
     if (this.selectedSeatsCount() !== this.availableSeats()) {
       this.showSeatsError.set(true);
-      
+
       return
     }
 
@@ -112,7 +124,7 @@ export class CineComponent {
     if (!this.paymentForm.valid) {
       return
     }
-    
+
     // Digamos que el pago se hace xd
     this.showPaymentModal.set(false);
     this.showSuccessModal.set(true);
@@ -140,5 +152,10 @@ export class CineComponent {
   onlyNumbers(event: any): void {
     const input = event.target as HTMLInputElement;
     input.value = input.value.replace(/[^0-9]/g, '');
+  }
+
+  isSeatUnavailable(row: number, col: number): boolean {
+    const seatId = `${this.generateLetters(this.rows())[row]}${col + 1}`;
+    return !this.availableSeatsList().includes(seatId);
   }
 }

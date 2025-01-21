@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { LoginComponent } from '@user/login/login.component';
 import { RegisterComponent } from '@user/register/register.component';
 import { RouterLink } from '@angular/router';
+import { User } from '../../../models/users.models';
+import { Administrator } from '../../../models/admin.models';
 
 @Component({
   selector: 'app-user-header',
@@ -18,11 +20,22 @@ export class HeaderComponent {
 
   ngOnInit() {
     console.log('Current user:', this.currentUser);
+    const userInfo = localStorage.getItem('user');
+    let localStorageUser: User | Administrator
+    console.log('User info:', userInfo);
+    
+    if (userInfo) {
+      localStorageUser = JSON.parse(userInfo);
+      console.log('Local storage user:', localStorageUser);
+    }
+    
   }
 
   private userService = inject(UserService);
 
-  currentUser = this.userService.currentUserValue()
+  currentUser = localStorage.getItem('user');
+
+  localStorageUser = this.currentUser?JSON.parse(this.currentUser):{firstname:"JoseMalo"};
 
   userExists = computed(() => this.userService.getCurrentUser() !== null && this.userService.getCurrentUser()?.first_name !== "")
 
@@ -51,5 +64,6 @@ export class HeaderComponent {
     this.userService.logoutUser();
     console.log('Logout successful!');
     console.log('Current user:', this.userService.getCurrentUser());
+    window.location.href = '/';
   }
 }
