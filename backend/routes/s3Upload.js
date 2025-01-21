@@ -4,7 +4,7 @@ const fs = require("fs");
 const dotenv = require('dotenv');
 dotenv.config();
 
-
+// Create an S3 client
 const s3 = new S3Client({
     region: process.env.AWS_REGION,
     credentials: {
@@ -13,6 +13,7 @@ const s3 = new S3Client({
     },
 });
 
+// Uploads a file to an AWS S3 bucket and returns the URL of the uploaded file
 const uploadToS3 = async (fileStream, fileName) => {
     try {
         const upload = new Upload({

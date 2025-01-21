@@ -1,0 +1,43 @@
+<div class="relative bg-customGrey min-h-screen">
+    
+    <div class="pt-10 mx-auto w-full max-w-md">
+        <form class="max-w-md mx-auto">
+            <div class="relative">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                    </svg>
+                </div>
+                <input type="text" [(ngModel)]="searchQuery" [ngModelOptions]="{standalone: true}" (input)="onSearch()"
+                    class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Search movies by title..." />
+
+            </div>
+        </form>
+    </div>
+
+    <div class="pt-10 mx-12">
+        <p-carousel [value]="filteredMovies()" [numVisible]="3" [numScroll]="3" [circular]="true"
+            autoplayInterval="3000">
+            <ng-template let-movie #item>
+                <a [routerLink]="['/info-movie', movie.id]"
+                    class="flex flex-col items-center justify-between w-64 h-96 bg-white shadow-lg rounded-lg p-4 mx-auto cursor-pointer no-underline">
+                    <div class="w-full h-2/3 rounded-lg overflow-hidden">
+                        <img [src]="movie.image_url" [alt]="movie.title" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="flex flex-col items-center text-center mt-4">
+                        <div class="font-semibold text-lg mb-2">{{ movie.title }}</div>
+                        <div class="text-sm text-gray-600 mb-4">{{ movie.genre }}</div>
+                        <div class="flex justify-between items-center w-full">
+                            <div class="font-semibold text-xl text-blue-600">{{ movie.rating }}</div>
+                        </div>
+                    </div>
+                </a>
+            </ng-template>
+        </p-carousel>
+    </div>
+
+    
+</div>

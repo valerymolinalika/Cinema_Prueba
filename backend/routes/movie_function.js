@@ -6,8 +6,7 @@ var router = express.Router();
 
 const { pool, connect } = require('./db_pool_connect');
 
-
-// Ruta para agregar una nueva función
+// Route to add a new movie function
 router.post('/add', async (req, res) => {
     const { movie_id, date_function, time_function, room_number, available_seats } = req.body;
 
@@ -49,10 +48,9 @@ router.post('/add', async (req, res) => {
     }
 });
 
-
-// Ruta para obtener todas las fechas de funciones de una película
+// Route to get all function dates for a specific movie
 router.get('/movie/dates', async (req, res) => {
-    const { movie_id } = req.query; // Usamos req.query en lugar de req.body para GET
+    const { movie_id } = req.query; 
 
     if (!movie_id) {
         return res.status(400).json({ error: { message: 'Missing required parameter: movie_id', status: 400 } });
@@ -71,19 +69,17 @@ router.get('/movie/dates', async (req, res) => {
             return res.status(404).json({ error: { message: 'No function dates found for the given movie ID', status: 404 } });
         }
 
-        // Respuesta exitosa
         res.status(200).json({
             message: 'Function dates retrieved successfully',
             dates: result.rows,
         });
     } catch (error) {
-        console.error('Error while fetching function dates:', error); // Log para depuración
+        console.error('Error while fetching function dates:', error); 
         res.status(500).json({ error: { message: 'Internal Server Error', status: 500 } });
     }
 });
 
-
-// Ruta para obtener todas las funciones de una película por su ID y fecha
+// Route to get all functions for a movie by its ID and date
 router.get('/functions', async (req, res) => {
     const { movie_id, date_function } = req.query;
 

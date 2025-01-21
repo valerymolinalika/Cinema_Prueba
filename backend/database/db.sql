@@ -33,20 +33,20 @@ CREATE TABLE users (
   PRIMARY KEY (id) 
 );
 
--- Movie Function Table (Changed from UUID to INT)
+-- Movie Function Table
 CREATE TABLE movie_function (
-  id SERIAL PRIMARY KEY,        -- Changed to use a normal INT id
+  id SERIAL PRIMARY KEY,        
   movie_id INT NOT NULL,
   date_function DATE NOT NULL,
   time_function TIME NOT NULL,
   room_number INT NOT NULL,
-  available_seats VARCHAR[] NOT NULL, -- Almacena un array de asientos, e.g., {A1, A2, B1, B2}
+  available_seats VARCHAR[] NOT NULL, 
   FOREIGN KEY (movie_id) REFERENCES movies(id)
 );
 
--- Invoice Table (UUID remains for invoice id)
+-- Invoice Table 
 CREATE TABLE invoice (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Using UUID here
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(), 
   total DECIMAL(10, 2) NOT NULL, 
   date_invoice DATE NOT NULL,            
   ticket_count INT NOT NULL      
@@ -56,24 +56,24 @@ CREATE TABLE invoice (
 CREATE TABLE ticket (
   id SERIAL PRIMARY KEY,
   user_id BIGINT NOT NULL,        
-  function_id INT NOT NULL,       -- Changed from UUID to INT
+  function_id INT NOT NULL,       
   price DECIMAL(10, 2) NOT NULL, 
   seat VARCHAR(5) NOT NULL,       
-  invoice_id UUID,               -- This remains a UUID to match invoice table
+  invoice_id UUID,              
   FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (function_id) REFERENCES movie_function(id),  -- Changed to reference INT id
+  FOREIGN KEY (function_id) REFERENCES movie_function(id),  
   FOREIGN KEY (invoice_id) REFERENCES invoice(id) 
 );
 
 -- ---------------------------------------------------------------------
--- Función para actualizar los asientos disponibles
+-- Function to update available seats
 CREATE OR REPLACE FUNCTION update_available_seats()
 RETURNS TRIGGER AS $$ 
 BEGIN 
-  -- Eliminar el asiento comprado del array de asientos disponibles
+  
   UPDATE movie_function 
-  SET available_seats = array_remove(available_seats::VARCHAR[], NEW.seat)  -- Convertir a VARCHAR[]
-  WHERE id = NEW.function_id; -- Cambiado para coincidir con el id INT de la función
+  SET available_seats = array_remove(available_seats::VARCHAR[], NEW.seat)  
+  WHERE id = NEW.function_id; 
 
   RETURN NEW; 
 END; 
@@ -90,4 +90,4 @@ EXECUTE FUNCTION update_available_seats();
 -- Sample Insert into Administrator
 INSERT INTO administrator (id, first_name, last_name, email, admin_password) 
 VALUES
-(123456789,'Valery','Molina','valery@gmail.com','$2b$10$FVJ1TIMOwD/mWcoUwA8PqOb5.A8tHXPD4xQYxLsAVjg58vRtXTYcq');
+(123456789,'Administrador','oficial','admin@gmail.com','$2b$10$FVJ1TIMOwD/mWcoUwA8PqOb5.A8tHXPD4xQYxLsAVjg58vRtXTYcq');

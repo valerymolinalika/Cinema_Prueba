@@ -1,0 +1,63 @@
+<div class="p-6">
+  <div class="flex space-x-6 w-10/12 mx-auto">
+    <!-- Movie Details -->
+    <div class="flex-1 flex flex-col gap-1">
+        <img
+          [src]="movie().image_url"
+          [alt]="movie().title"
+          class="w-1/2 h-auto rounded-lg mx-auto shadow-2xl"
+        />
+      <br/>
+      <h1 class="text-3xl font-bold mb-4">{{ movie().title }}</h1>
+      <p class="text-lg text-gray-700 mb-2">
+        <strong>Genre:</strong> {{ movie().genre }}
+      </p>
+      <p class="text-lg text-gray-700 mb-2">
+        <strong>Rating:</strong> {{ movie().rating }}
+      </p>
+      <p class="text-lg text-gray-700 mb-4">
+        <strong>Synopsis:</strong> {{ movie().synopsis }}
+      </p>
+    </div>
+
+    <!-- Dates and Functions -->
+    <div class="flex-1">
+      <!-- Dates -->
+      <div class="flex space-x-4 mb-6">
+        <button
+          *ngFor="let date of dates"
+          (click)="onDateSelected(date)"
+          [ngClass]="{
+            'bg-customDarkred text-white': date === selectedDate,
+            'bg-customRed text-white': date !== selectedDate
+          }"
+          class="text-white px-4 py-2 rounded-full hover:bg-customDarkred"
+        >
+          {{ date }}
+        </button>
+      </div>
+
+      <!-- Functions -->
+      <div *ngIf="functions.length > 0 && selectedDate" class="mt-4">
+        <h2 class="text-xl font-bold mb-4">
+          Available Functions
+        </h2>
+        <div class="flex flex-wrap gap-4">
+          <button
+            *ngFor="let func of functions"
+            [ngClass]="{
+              'bg-gray-300 text-black': func.time_function === selectedHour,
+              'bg-gray-200': func.time_function !== selectedHour
+            }"
+            (click)="onHourSelected(func.time_function)"
+            class="bg-gray-200 text-gray-700 text-sm px-3 py-1 rounded-full hover:bg-gray-300"
+          >
+            {{ func.time_function }}
+          </button>
+        </div>
+      </div>
+
+      <app-cine [inputRows]="numRow" [inputCols]="numCol" [inputAvailableSeats]="selectedFunction?.available_seats || []" [inputMovieId]="selectedFunction?.id"></app-cine>
+    </div>
+  </div>
+</div>
