@@ -189,8 +189,9 @@ export class MoviesListComponent {
   async confirmEditMovie() {
     const movie = this.selectedMovie();
     if (movie && movie.id) {
+      
       try {
-        //await this.movieService.updateMovie(movie.id, movie); // Ensure `updateMovie` is implemented in your service
+        await this.movieService.editMovie(movie.id, movie); // Ensure `updateMovie` is implemented in your service
         this.getMovies(); // Refresh the movies list
         this.closeEditMovieModal(); // Close modal after successful edit
       } catch (error) {

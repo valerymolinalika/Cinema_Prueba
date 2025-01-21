@@ -56,6 +56,12 @@
         You must select exactly {{availableSeats()}} seat(s)
       </div>
     }
+    @if (showLogginError()) {
+      <div class="text-red-500 text-sm mt-2">
+        'You need to log in to proceed with the payment'
+      </div>
+    }
+
   </div>
 </div>
 

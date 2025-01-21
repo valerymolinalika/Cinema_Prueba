@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import axios from 'axios';
 import { Purchase } from "../models/purchase.models";
-import { invoice } from "../models/invoice.models";
+import { Invoice } from "../models/invoice.models";
 
 
 
@@ -26,7 +26,7 @@ export class PurchaseService {
         }
     }
     
-    async createPurchase(invoice: invoice): Promise<Purchase> {
+    async createPurchase(invoice: Invoice): Promise<Purchase> {
         try {
         const response = await axios.post(`${this.apiUrl}/invoice/buy-ticket`, invoice);
         console.log('Purchase created:', response.data);

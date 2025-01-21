@@ -130,13 +130,14 @@ export class MovieService {
     }
   }
 
-  // async editMovie (movie: Movie): Promise<Movie>{
-  //   try {
-  //     const response = await axios.put(`${this.apiUrl}/movies/${id}`)
-
-  //   }catch (error) {
-  //     console.error('Error editing movie:', error);
-  //     throw error;
-  // }
+  async editMovie(id: number, movie: Movie): Promise<Movie> {
+    try {
+      const response = await axios.put(`${this.apiUrl}/movies/edit/${id}`, movie);
+      return response.data;
+    } catch (error) {
+      console.error('Error editing movie:', error);
+      throw error;
+    }
+  }
 
 }

@@ -1,7 +1,10 @@
 
-import { Component, Input, SimpleChange, SimpleChanges, ViewChild, computed, signal } from '@angular/core';
+import { Component, Input, SimpleChange, SimpleChanges, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { UserService } from '../../../services/user.service';
+import { PurchaseService } from '../../../services/purchase.service';
+import { Invoice } from '../../../models/invoice.models';
 
 @Component({
   selector: 'app-cine',
@@ -14,7 +17,9 @@ export class CineComponent {
   @Input({ required: true }) inputRows: number = 4;
   @Input({ required: true }) inputCols: number = 4;
   @Input({ required: true }) inputAvailableSeats: string[] = [];
+  @Input({required: true})   inputMovieId: string = "";
   @ViewChild('paymentForm') paymentForm!: NgForm;
+
 
   // Seats signals
   rows = signal(this.inputRows);
@@ -25,6 +30,7 @@ export class CineComponent {
   maxSeats = computed(() => this.rows() * this.cols());
   showMaxSeatsError = signal(false);
   showSeatsError = signal(false);
+  showLogginError = signal(false);
 
   // Payment signals
   showPaymentModal = signal(false);
@@ -37,6 +43,15 @@ export class CineComponent {
   // Computed
   selectedSeatsCount = computed(() => this.selectedSeats().size);
   availableSeatsCount = computed(() => this.availableSeatsList().length);
+
+  userService = inject(UserService); 
+  userExists = computed(() => {
+        const user = this.userService.getCurrentUser();
+        console.log('Header computed userExists:', !!user?.first_name);
+        return !!user?.first_name;
+    });
+
+  purchaseService = inject(PurchaseService);
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['inputRows']) {
@@ -103,32 +118,56 @@ export class CineComponent {
   }
 
   // Payment
-  openPaymentModal(): void {
-    if (this.selectedSeatsCount() !== this.availableSeats()) {
-      this.showSeatsError.set(true);
-
-      return
-    }
-
-    this.showSeatsError.set(false);
-    this.showPaymentModal.set(true);
+  // Payment
+openPaymentModal(): void {
+  if (!this.userExists()) {
+    this.showLogginError.set(true);
+    setTimeout(() => this.showLogginError.set(false), 3000); 
+    return;
   }
+
+  if (this.selectedSeatsCount() !== this.availableSeats()) {
+    this.showSeatsError.set(true);
+    return;
+  }
+
+  this.showSeatsError.set(false);
+  this.showPaymentModal.set(true);
+}
+
 
   closePaymentModal(): void {
     this.showPaymentModal.set(false);
     this.resetForm();
   }
 
-  processPayment(): void {
+  async processPayment() {
     this.formSubmitted.set(true);
     if (!this.paymentForm.valid) {
       return
     }
+    try {
+      const currentUser = this.userService.getCurrentUser();
+      if (!currentUser) {
+        return;
+      }
+      const invoice: Invoice = {
+        user_id: currentUser.id,
+        function_id: this.inputMovieId, 
+        seats: this.getFormattedSeats(),
+        price_per_ticket: '20000', 
+      };
 
-    // Digamos que el pago se hace xd
-    this.showPaymentModal.set(false);
-    this.showSuccessModal.set(true);
+      const purchase = await this.purchaseService.createPurchase(invoice);
+      console.log('Purchase successful:', purchase);
+
+      this.showPaymentModal.set(false);
+      this.showSuccessModal.set(true);
+    } catch (error) {
+      console.error('Error processing payment:', error);
+    }
   }
+    
 
   resetForm(): void {
     this.cardNumber.set('');
@@ -158,4 +197,7 @@ export class CineComponent {
     const seatId = `${this.generateLetters(this.rows())[row]}${col + 1}`;
     return !this.availableSeatsList().includes(seatId);
   }
+
+ 
+
 }

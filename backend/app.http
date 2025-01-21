@@ -118,7 +118,7 @@ Content-Type: application/json
 
 {
   "user_id": "12345678",
-  "function_id": 3,
+  "function_id": "3",
   "seats": ["A3"],
   "price_per_ticket": 10000
 }

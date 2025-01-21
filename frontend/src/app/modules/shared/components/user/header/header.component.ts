@@ -13,13 +13,18 @@ import { Administrator } from '../../../models/admin.models';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
 })
-export class HeaderComponent {
-  
+export class HeaderComponent {  
   showLogin = false;
   showRegister = false;
 
   private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
+
+  ngOnInit() {
+    if (this.userService.getLoginActive()) {
+      this.userService.changeLoginActive()
+    }
+  }
 
   userExists = computed(() => {
     const user = this.userService.getCurrentUser();
@@ -36,7 +41,7 @@ export class HeaderComponent {
   constructor() {
     effect(() => {
       this.showLogin = this.userService.getLoginActive();
-      this.cdr.detectChanges();
+      // this.cdr.detectChanges();
     });
 
     effect(() => {
@@ -56,7 +61,9 @@ export class HeaderComponent {
   logout() {
     this.userService.logoutUser();
     console.log('Logout successful!');
-    this.cdr.detectChanges();
+    // this.cdr.detectChanges();
+    localStorage.clear()
     window.location.href = '/';
+
   }
 }

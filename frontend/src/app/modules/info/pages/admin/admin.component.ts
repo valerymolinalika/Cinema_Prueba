@@ -19,9 +19,8 @@ export class AdminComponent {
 
   isAdmin = computed(() => {
     const user = this.userService.getCurrentUser();
-    console.log('Header computed userExists:', !!user?.first_name);
     return !!user?.isAdmin && user?.isAdmin;
   });
   activeTab: string = 'users';
-  
+
 }

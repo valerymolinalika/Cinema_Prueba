@@ -14,12 +14,6 @@ import { CommonModule } from '@angular/common';
 })
 export class InfoMovieComponent {
 
-  userExists = computed(() => {
-      const user = this.userService.getCurrentUser();
-      console.log('Header computed userExists:', !!user?.first_name);
-      return !!user?.first_name;
-  });
-
   numRow = 2;
   numCol = 6;
 
@@ -35,14 +29,14 @@ export class InfoMovieComponent {
   };
   
   movieService = inject(MovieService);
-  userService = inject(UserService);  // Usar el servicio de usuario para obtener las fechas
+  userService = inject(UserService);  
   movie = signal<Movie>(this.infoMovie);
 
-  dates: string[] = [];  // Aquí se almacenarán las fechas de las funciones
-  functions: any[] = []; // Aquí se almacenarán las funciones para la fecha seleccionada
-  selectedDate: string = ''; // Fecha seleccionada
-  selectedHour: string=''; //Hora seleccionada
-  selectedFunction: any = null; // Función seleccionada
+  dates: string[] = [];  
+  functions: any[] = []; 
+  selectedDate: string = ''; 
+  selectedHour: string=''; 
+  selectedFunction: any = null; 
 
   constructor(private route: ActivatedRoute) {}
 
@@ -50,7 +44,7 @@ export class InfoMovieComponent {
     this.route.params.subscribe(params => {
       const id = params['id'];
       this.getMovieById(id);
-      this.getDatesForMovie(id);  // Obtener fechas de funciones
+      this.getDatesForMovie(id);  
     });
   }
 
@@ -72,13 +66,13 @@ export class InfoMovieComponent {
   }
 
   async onDateSelected(date: string) {
-    this.selectedDate = date; // Actualizamos la fecha seleccionada
+    this.selectedDate = date; 
     try {
       const functions = await this.movieService.getFunctionsByDate(Number(this.movie().id), date);
-      // Formatear las horas de las funciones
+      
       this.functions = functions.map(func => ({
         ...func,
-        time_function: func.time_function.substring(0, 5) // Tomar solo "HH:mm"
+        time_function: func.time_function.substring(0, 5) 
       }));
       console.log('Functions for selected date:', this.functions);
     } catch (error) {
@@ -86,7 +80,7 @@ export class InfoMovieComponent {
     }
   }
   async onHourSelected(hour: string) {
-    this.selectedHour = hour; // Actualizamos la hora seleccionada
+    this.selectedHour = hour; 
     this.selectedFunction = this.functions.find(func => func.time_function === hour);
     console.log('Selected Function:', this.selectedFunction);
   }
