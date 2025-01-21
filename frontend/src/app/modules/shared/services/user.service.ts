@@ -1,7 +1,9 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Inject, Injectable, signal } from '@angular/core';
 import axios from 'axios';
 import { User } from '../models/users.models';
 import { Administrator } from '../models/admin.models';
+import { CommonModule, DOCUMENT } from '@angular/common';
+
 
 @Injectable({
     providedIn: 'root',
@@ -9,7 +11,22 @@ import { Administrator } from '../models/admin.models';
 export class UserService {
     private apiUrl = 'http://localhost:3001';
 
-    constructor() { }
+    constructor(@Inject(DOCUMENT) private document: Document) {
+        const localStorage = document.defaultView?.localStorage;
+        console.log("localStorage", localStorage)
+        
+        if (localStorage) {
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                const user = JSON.parse(storedUser);
+                this.currentUser.set(user);
+                this.isAdministrator.set(!!user.isAdmin);
+            }
+        }
+        
+        
+
+    }
 
     loginActive = signal(false);
     public loginActiveValue = computed(() => this.loginActive());
@@ -27,13 +44,19 @@ export class UserService {
     }
 
     changeCurrentUser(user: User | Administrator) {
-        if (this.currentUser()) {
-            return
+        console.log('Setting current user in service:', user);
+        // por si acaso
+        if (!user.first_name || !user.email) {
+          console.error('Invalid user data:', user);
+          return;
         }
+        
         this.currentUser.set(user);
-    }
+        this.isAdministrator.set(!!user.isAdmin);
+        localStorage.setItem('user', JSON.stringify(user));
+      }
 
-    changeIsAdministrator(isAdmin: boolean | undefined ) {
+    changeIsAdministrator(isAdmin: boolean | undefined) {
         if (isAdmin) {
             this.isAdministrator.set(isAdmin);
         }
@@ -58,11 +81,11 @@ export class UserService {
                 email,
                 user_password,
             });
-    
+
             console.log('User logged in:', response.data);
-    
+
             const { isAdmin, ...userData } = response.data;
-            
+
             if (isAdmin) {
                 const admin: Administrator = {
                     id: userData.id,
@@ -94,7 +117,7 @@ export class UserService {
             throw new Error(error.response?.data || 'Error during login');
         }
     }
-    
+
 
 
 
@@ -109,11 +132,10 @@ export class UserService {
         }
     }
 
-    getCurrentUser() {
-        const rawCurrentUser = localStorage.getItem('user');
-        const localStorageUser = rawCurrentUser?JSON.parse(rawCurrentUser):null;
-        return localStorageUser
-        // return this.currentUser();
+    getCurrentUser(): User | Administrator | null {
+        const user = this.currentUser();
+        console.log('Getting current user from service:', user);
+        return user;
     }
 
     logoutUser() {

@@ -1,29 +1,36 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, effect, inject, signal } from '@angular/core';
 import { MovieService } from '../../../services/movie.service';
 import { Movie } from '../../../models/movie.models';
 import { MovieFunction } from '../../../models/movie_function.models';
 import { FormsModule } from '@angular/forms';
 import { get } from 'http';
+import { User } from '../../../models/users.models';
+import { Administrator } from '../../../models/admin.models';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-movies-list',
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './movies-list.component.html',
   styleUrl: './movies-list.component.css'
 })
 export class MoviesListComponent {
+  private userSer = inject(UserService)
+  
+  private cdr = inject(ChangeDetectorRef);
+  currentUser = signal<User | null>(null);
   movieService = inject(MovieService);
   movies = signal<Movie[]>([]);
-  availableMovies: Movie[] =[];
+  availableMovies: Movie[] = [];
   selectedMovie = signal<Movie | null>(null);
   showModal = signal(false);
-  showCreateMovieFunctionModal = signal(false); 
-  showCreateMovieModal = signal(false); 
-  showEditMovieModalSignal = signal(false); // Signal to control Edit Movie Modal visibility
+  showCreateMovieFunctionModal = signal(false);
+  showCreateMovieModal = signal(false);
+  showEditMovieModalSignal = signal(false); 
   newMovieFunction: MovieFunction = {
     id: 0,
-    movie_id: 0, 
+    movie_id: 0,
     date_function: '',
     time_function: '',
     room_number: 0,
@@ -37,31 +44,56 @@ export class MoviesListComponent {
     image_url: '',
     available: true,
     genre: '',
-    administrator_id: 123456789
+    administrator_id: this.userSer.currentUserValue()?.id || 0
   }
+  searchQuery: string = '';
+  filteredMovies = signal<Movie[]>([]);
 
+  constructor() {
+    effect(()=>{
+      const storedUser = localStorage.getItem('user')
+      if (storedUser){
+        this.currentUser.set(JSON.parse(storedUser));
+      }
+    })
+  }
+  
   ngOnInit() {
     this.getMovies();
+
+  }
+
+  onSearch() {
+    const query = this.searchQuery.toLowerCase().trim(); 
+    if (!query) {
+      this.filteredMovies.set(this.movies()); 
+    } else {
+      const filtered = this.movies().filter((movie) =>
+        movie.title.toLowerCase().includes(query) 
+      );
+      this.filteredMovies.set(filtered); 
+    }
   }
 
   private async getMovies() {
     this.movieService.getMovies()
       .then((movies) => {
-        this.movies.set(movies); 
+        this.movies.set(movies);
+        this.filteredMovies.set(movies); 
       });
   }
 
   async toggleAvailability(movie: Movie) {
     this.selectedMovie.set(movie);
-    this.showModal.set(true); 
+    this.showModal.set(true);
   }
 
   async confirmChangeAvailability() {
     const movie = this.selectedMovie();
     if (movie) {
       try {
-        const updatedAvailability = !movie.available; 
-        if(movie.id) {
+        const updatedAvailability = !movie.available;
+        if (movie.id) {
           await this.movieService.updateUserAvailability(movie.id, updatedAvailability);
           this.getMovies();
           this.closeModal();
@@ -73,13 +105,13 @@ export class MoviesListComponent {
   }
 
   closeModal() {
-    this.showModal.set(false); 
-    this.selectedMovie.set(null); 
+    this.showModal.set(false);
+    this.selectedMovie.set(null);
   }
 
   showFunctionModal() {
-    this.availableMovies = this.movies().filter((movie:Movie) => movie.available);
-    this.showCreateMovieFunctionModal.set(true); 
+    this.availableMovies = this.movies().filter((movie: Movie) => movie.available);
+    this.showCreateMovieFunctionModal.set(true);
   }
 
   showMovieModal() {
@@ -89,17 +121,17 @@ export class MoviesListComponent {
   async confirmCreateMovieFunction() {
     try {
       const availableSeatsArray = this.availableSeatsInput
-        .split(',')  
-        .map(seat => seat.trim());  
+        .split(',')
+        .map(seat => seat.trim());
 
-      this.newMovieFunction.available_seats = availableSeatsArray; 
+      this.newMovieFunction.available_seats = availableSeatsArray;
       if (this.newMovieFunction.movie_id === 0) {
         alert('Please enter a valid Movie ID');
         return;
       }
-      await this.movieService.createMovieFunction(this.newMovieFunction);  
-      this.getMovies();  
-      this.closeCreateFunctionModal();  
+      await this.movieService.createMovieFunction(this.newMovieFunction);
+      this.getMovies();
+      this.closeCreateFunctionModal();
     } catch (error) {
       console.error('Error creating movie function:', error);
     }
@@ -108,9 +140,9 @@ export class MoviesListComponent {
   async confirmCreateMovie() {
     try {
       await this.movieService.createMovie(this.newMovie);
-      this.getMovies();  
+      this.getMovies();
       this.closeCreateMovieModal()
-    }catch (error){
+    } catch (error) {
       console.error('Error creating movie:', error);
     }
   }
@@ -119,7 +151,7 @@ export class MoviesListComponent {
     this.showCreateMovieFunctionModal.set(false);
     this.newMovieFunction = {
       id: 0,
-      movie_id: 0,  
+      movie_id: 0,
       date_function: '',
       time_function: '',
       room_number: 0,
@@ -142,19 +174,18 @@ export class MoviesListComponent {
   }
 
 
-  // Open the Edit Movie Modal and set the selected movie
   showEditMovieModal(movie: Movie) {
     this.showEditMovieModalSignal.set(true);
-    this.selectedMovie.set({ ...movie }); // Clone to avoid immediate changes
+    this.selectedMovie.set({ ...movie }); 
   }
 
-  // Close the Edit Movie Modal
+  
   closeEditMovieModal() {
     this.showEditMovieModalSignal.set(false);
     this.selectedMovie.set(null);
   }
 
-  // Confirm edits and save the updated movie
+  
   async confirmEditMovie() {
     const movie = this.selectedMovie();
     if (movie && movie.id) {

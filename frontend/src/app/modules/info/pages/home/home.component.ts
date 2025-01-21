@@ -20,8 +20,8 @@ export class HomeComponent {
   userService = inject(UserService);
 
   movies = signal<Movie[]>([]); 
-  filteredMovies = signal<Movie[]>([]); // Películas filtradas según la búsqueda
-  searchQuery: string = ''; // Query de búsqueda
+  filteredMovies = signal<Movie[]>([]); 
+  searchQuery: string = ''; 
 
   private movieService = inject(MovieService);
 

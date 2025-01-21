@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MovieService } from '../../../shared/services/movie.service';
 import { Movie } from '../../../shared/models/movie.models';
@@ -13,6 +13,12 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./info-movie.component.css']
 })
 export class InfoMovieComponent {
+
+  userExists = computed(() => {
+      const user = this.userService.getCurrentUser();
+      console.log('Header computed userExists:', !!user?.first_name);
+      return !!user?.first_name;
+  });
 
   numRow = 2;
   numCol = 6;
@@ -36,6 +42,7 @@ export class InfoMovieComponent {
   functions: any[] = []; // Aquí se almacenarán las funciones para la fecha seleccionada
   selectedDate: string = ''; // Fecha seleccionada
   selectedHour: string=''; //Hora seleccionada
+  selectedFunction: any = null; // Función seleccionada
 
   constructor(private route: ActivatedRoute) {}
 
@@ -79,18 +86,9 @@ export class InfoMovieComponent {
     }
   }
   async onHourSelected(hour: string) {
-    this.selectedHour= hour; // Actualizamos la hora seleccionada
-    // try {
-    //   const functions = await this.movieService.getFunctionsByDate(Number(this.movie().id), date);
-    //   // Formatear las horas de las funciones
-    //   this.functions = functions.map(func => ({
-    //     ...func,
-    //     time_function: func.time_function.substring(0, 5) // Tomar solo "HH:mm"
-    //   }));
-    //   console.log('Functions for selected date:', this.functions);
-    // } catch (error) {
-    //   console.error('Error fetching functions for selected date:', error);
-    // }
+    this.selectedHour = hour; // Actualizamos la hora seleccionada
+    this.selectedFunction = this.functions.find(func => func.time_function === hour);
+    console.log('Selected Function:', this.selectedFunction);
   }
   
 }

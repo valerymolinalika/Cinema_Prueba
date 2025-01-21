@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, ChangeDetectorRef } from '@angular/core';
 import { UserService } from '../../../services/user.service';
 import { CommonModule } from '@angular/common';
 import { LoginComponent } from '@user/login/login.component';
@@ -18,40 +18,33 @@ export class HeaderComponent {
   showLogin = false;
   showRegister = false;
 
-  ngOnInit() {
-    console.log('Current user:', this.currentUser);
-    const userInfo = localStorage.getItem('user');
-    let localStorageUser: User | Administrator
-    console.log('User info:', userInfo);
-    
-    if (userInfo) {
-      localStorageUser = JSON.parse(userInfo);
-      console.log('Local storage user:', localStorageUser);
-    }
-    
-  }
-
   private userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef);
 
-  currentUser = localStorage.getItem('user');
+  userExists = computed(() => {
+    const user = this.userService.getCurrentUser();
+    console.log('Header computed userExists:', !!user?.first_name);
+    return !!user?.first_name;
+  });
 
-  localStorageUser = this.currentUser?JSON.parse(this.currentUser):{firstname:"JoseMalo"};
-
-  userExists = computed(() => this.userService.getCurrentUser() !== null && this.userService.getCurrentUser()?.first_name !== "")
-
-  currentUserValue = computed(() => this.userService.getCurrentUser())
+  currentUserValue = computed(() => {
+    const user = this.userService.getCurrentUser();
+    console.log('Header computed currentUserValue:', user);
+    return user;
+  });
 
   constructor() {
-      // Efecto para mostrar el modal de login
-      effect(() => {
-        this.showLogin = this.userService.getLoginActive();
-      });
-  
-      // Efecto para mostrar el modal de registro
-      effect(() => {
-        this.showRegister = this.userService.getRegisterActive();
-      });
-    }
+    effect(() => {
+      this.showLogin = this.userService.getLoginActive();
+      this.cdr.detectChanges();
+    });
+
+    effect(() => {
+      this.showRegister = this.userService.getRegisterActive();
+      this.cdr.detectChanges();
+    });
+  }
+
   setLogin() {
     this.userService.changeLoginActive();
   }
@@ -63,7 +56,7 @@ export class HeaderComponent {
   logout() {
     this.userService.logoutUser();
     console.log('Logout successful!');
-    console.log('Current user:', this.userService.getCurrentUser());
+    this.cdr.detectChanges();
     window.location.href = '/';
   }
 }

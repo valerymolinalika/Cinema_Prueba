@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { UserService } from '../../../services/user.service';
 import { User } from '../../../models/users.models';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,7 @@ import { CommonModule } from '@angular/common';
 })
 export class LoginComponent {
   private userService = inject(UserService);
-  
+  private router = inject(Router);
   setLogin() {
     this.userService.changeLoginActive();
   }
@@ -41,12 +42,9 @@ export class LoginComponent {
         console.log("currentUser", this.userService.getCurrentUser())
         console.log('Login successful!');
         this.userService.changeIsAdministrator(user.isAdmin)
-        localStorage.setItem('user', JSON.stringify(user));
+        this.userService.changeLoginActive();
         if (user.isAdmin) {
-          window.location.href = '/admin';
-          console.log('Administrator logged in');
-        }else{
-          window.location.href = '/';
+          this.router.navigate(['/admin']);
         }
 
       })

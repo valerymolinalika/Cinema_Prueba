@@ -2,18 +2,21 @@ import { Component, inject, signal } from '@angular/core';
 import { UserService } from '../../../services/user.service';
 import { User } from '../../../models/users.models';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-user-list',
-  imports: [CommonModule],
+  imports: [CommonModule,FormsModule],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.css',
 })
 export class UserListComponent {
   userService = inject(UserService);
   users = signal<User[]>([]);
-  selectedUser = signal<User | null>(null); // Usuario seleccionado para cambiar disponibilidad
-  showModal = signal(false); // Estado del modal
+  selectedUser = signal<User | null>(null); 
+  showModal = signal(false); 
+  searchQuery: string = '';
+  filteredUsers = signal<User[]>([])
 
   ngOnInit() {
     this.getUsers();
@@ -22,7 +25,20 @@ export class UserListComponent {
   private async getUsers() {
     this.userService.getUsers().then((users) => {
       this.users.set(users);
+      this.filteredUsers.set(users);
     });
+  }
+
+  onSearch() {
+    const query = this.searchQuery.toLowerCase().trim(); 
+    if (!query) {
+      this.filteredUsers.set(this.users()); 
+    } else {
+      const filtered = this.users().filter((user) =>
+        user.first_name.toLowerCase().includes(query) 
+      );
+      this.filteredUsers.set(filtered); 
+    }
   }
 
   async toggleAvailability(user: User) {
