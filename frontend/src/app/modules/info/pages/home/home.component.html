@@ -1,5 +1,5 @@
 <div class="relative bg-customGrey min-h-screen">
-    <!-- Buscador -->
+    
     <div class="pt-10 mx-auto w-full max-w-md">
         <form class="max-w-md mx-auto">
             <div class="relative">
@@ -18,7 +18,6 @@
         </form>
     </div>
 
-    <!-- Carrusel con margen y separación -->
     <div class="pt-10 mx-12">
         <p-carousel [value]="filteredMovies()" [numVisible]="3" [numScroll]="3" [circular]="true"
             autoplayInterval="3000">
@@ -40,20 +39,5 @@
         </p-carousel>
     </div>
 
-    <!-- Modales -->
-    @if(showLogin) {
-    <div class="fixed inset-0 pt-20 flex items-center justify-center z-50">
-        <div class="w-96 bg-transparent p-6">
-            <app-login />
-        </div>
-    </div>
-    }
-
-    @if(showRegister) {
-    <div class="fixed inset-0 pt-20 flex items-center justify-center z-50">
-        <div class="w-96 bg-transparent p-6">
-            <app-register />
-        </div>
-    </div>
-    }
+    
 </div>

@@ -14,9 +14,8 @@ const { pool, connect } = require('./db_pool_connect');
 router.get('/', async function (req, res, next) {
     try {
         const getMoviesQuery = `
-            SELECT id, title, synopsis, rating, image_url, genre
+            SELECT id, title, synopsis, rating, image_url, genre, available
             FROM movies
-            WHERE available = true
         `;
         const movies = await pool.query(getMoviesQuery);
         res.status(200).json(movies.rows);
@@ -138,6 +137,35 @@ router.put('/edit/:id', async function (req, res, next) {
         });
     } catch (error) {
         console.error('Error while updating movie:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+// Ruta para actualizar el estado de 'available' de una pelicula
+router.put('/available', async function (req, res, next) {
+    try {
+        const { id, available } = req.body;
+
+        if (!id || available === undefined) {
+            return res.status(400).send('Missing required fields: id and available');
+        }
+
+        const updateAvailableQuery = `
+            UPDATE movies
+            SET available = $1
+            WHERE id = $2
+        `;
+
+        const result = await pool.query(updateAvailableQuery, [available, id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).send('Movie not found');
+        }
+
+        res.status(200).send('Movie availability updated successfully');
+    } catch (error) {
+        console.error('Error while updating user availability:', error);
         res.status(500).send('Internal Server Error');
     }
 });

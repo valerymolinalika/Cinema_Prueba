@@ -1,0 +1,48 @@
+<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+      <thead class="text-xs text-white uppercase bg-customBlue dark:bg-customDarkgrey">
+        <tr>
+          <th scope="col" class="px-6 py-3">Invoice ID</th>
+          <th scope="col" class="px-6 py-3">User ID</th>
+          <th scope="col" class="px-6 py-3">User Name</th>
+          <th scope="col" class="px-6 py-3">Price per Ticket</th>
+          <th scope="col" class="px-6 py-3">Total Price</th>
+          <th scope="col" class="px-6 py-3">Purchase Date</th>
+          <th scope="col" class="px-6 py-3">Seats</th>
+          <th scope="col" class="px-6 py-3">Movie Title</th>
+          <th scope="col" class="px-6 py-3">Function Date</th>
+          <th scope="col" class="px-6 py-3">Function Time</th>
+          <th scope="col" class="px-6 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let purchase of purchases()"
+          class="odd:bg-customGrey even:bg-white border-b dark:border-gray-700">
+          <td class="px-6 py-4">{{ purchase.invoice_id }}</td>
+          <td class="px-6 py-4">{{ purchase.user_id }}</td>
+          <td class="px-6 py-4">{{ purchase.user_name }}</td>
+          <td class="px-6 py-4">{{ purchase.price_per_ticket }}</td>
+          <td class="px-6 py-4">{{ purchase.total_price }}</td>
+          <td class="px-6 py-4">{{ purchase.purchase_date | date: 'shortDate' }}</td>
+          <td class="px-6 py-4">
+            <div class="flex flex-wrap">
+                <p *ngFor="let seat of purchase.seats" class="inline-block text-xs px-2 py-1">
+                    {{ seat }}
+                </p>
+            </div>
+          </td>
+          <td class="px-6 py-4">{{ purchase.movie_title }}</td>
+          <td class="px-6 py-4">{{ purchase.function_date | date: 'shortDate' }}</td>
+          <td class="px-6 py-4">{{ purchase.function_time }}</td>
+          <td class="px-6 py-4">
+            <button
+              class="px-4 py-2 text-white bg-customBlue hover:bg-customDarkgrey rounded">
+              View Details
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

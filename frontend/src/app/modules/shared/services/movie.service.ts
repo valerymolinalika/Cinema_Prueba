@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import axios from 'axios';
-import { Movie } from './../models/movie.models';  // Asegúrate de importar el modelo correctamente
+import { Movie } from './../models/movie.models';  
 import { MovieFunction } from '../models/movie_function.models';
 import { parse, format } from 'date-fns'; 
 
@@ -8,7 +8,7 @@ import { parse, format } from 'date-fns';
   providedIn: 'root',
 })
 export class MovieService {
-  private apiUrl = 'http://localhost:3001';  // La URL base de tu API (ajústala según corresponda)
+  private apiUrl = 'http://localhost:3001';  
 
   constructor() {}
   async getMovies(): Promise<Movie[]> {
@@ -100,7 +100,34 @@ export class MovieService {
     }
   }
   
-  
-  
+  async updateUserAvailability(id: number, available: boolean): Promise<string> {
+    try {
+      const response = await axios.put(`${this.apiUrl}/movies/available`, {
+        id,
+        available,
+      });
+      console.log('Movie availability updated:', response.data);
+      return response.data; 
+    } catch (error: any) {
+      console.error(
+        'Error while updating user availability:',
+        error.response?.data || error.message
+      );
+      throw new Error(
+        error.response?.data || 'Error while updating user availability'
+      );
+    } 
 }
-  
+
+ // Crear una nueva función de película
+ async createMovieFunction(movieFunction: MovieFunction): Promise<MovieFunction> {
+  try {
+    const response = await axios.post(`${this.apiUrl}/movie_function/add`, movieFunction);
+    console.log('Movie function created:', response.data);
+    return response.data.function; // Devuelve la función de película creada
+  } catch (error) {
+    console.error('Error creating movie function:', error);
+    throw error;
+  }
+}
+}

@@ -11,17 +11,15 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, RegisterComponent, LoginComponent, Carousel, ButtonModule, FormsModule],
+  imports: [RouterLink, Carousel, ButtonModule, FormsModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
 
   userService = inject(UserService);
-  showLogin = false;
-  showRegister = false;
 
-  movies = signal<Movie[]>([]); // Lista completa de películas
+  movies = signal<Movie[]>([]); 
   filteredMovies = signal<Movie[]>([]); // Películas filtradas según la búsqueda
   searchQuery: string = ''; // Query de búsqueda
 
@@ -31,27 +29,20 @@ export class HomeComponent {
     this.getMovies();
   }
 
-  constructor() {
-    // Efecto para mostrar el modal de login
-    effect(() => {
-      this.showLogin = this.userService.getLoginActive();
-    });
-
-    // Efecto para mostrar el modal de registro
-    effect(() => {
-      this.showRegister = this.userService.getRegisterActive();
-    });
-  }
 
   private async getMovies() {
-    this.movieService.getMovies()
-      .then((movies) => {
-        this.movies.set(movies); // Almacena las películas originales
-        this.filteredMovies.set(movies); // Inicializa las películas filtradas
-        console.log('Movies:', movies);
-      });
+    try {
+      const movies = await this.movieService.getMovies();
+      const availableMovies = movies.filter((movie) => movie.available); // Filtrar películas disponibles
+      this.movies.set(availableMovies); // Almacenar solo las películas disponibles
+      this.filteredMovies.set(availableMovies); // Inicializar con las películas disponibles
+      console.log('Available Movies:', availableMovies);
+    } catch (error) {
+      console.error('Error fetching movies:', error);
+    }
   }
-
+  
+  
   onSearch() {
     const query = this.searchQuery.toLowerCase().trim(); // Normaliza el texto de búsqueda
     if (!query) {

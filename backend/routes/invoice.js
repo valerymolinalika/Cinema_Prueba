@@ -9,7 +9,7 @@ const { pool } = require('./db_pool_connect');
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
-  secure: true, // true for port 465, false for other ports
+  secure: true, 
   auth: {
     user: "cinema202501@gmail.com",
     pass: process.env.GMAIL_ACCSESS,
@@ -46,7 +46,7 @@ router.post('/buy-ticket', async (req, res) => {
     }
 
     const current_date = new Date(); // Obtener la fecha actual
-    const total_price = price_per_ticket * seats.length; // Total de la compra
+    const total_price = price_per_ticket * seats.length; 
 
     try {
         // Obtener el correo del usuario a partir del user_id
@@ -59,7 +59,6 @@ router.post('/buy-ticket', async (req, res) => {
         
         const userEmail = userResult.rows[0].email;
 
-        // Insertar la factura
         const insertInvoiceQuery = `
             INSERT INTO invoice (total, date_invoice, ticket_count)
             VALUES ($1, $2, $3)
@@ -68,7 +67,6 @@ router.post('/buy-ticket', async (req, res) => {
         const invoiceResult = await pool.query(insertInvoiceQuery, [total_price, current_date, seats.length]);
         const invoice_id = invoiceResult.rows[0].id;
 
-        // Insertar tickets para cada silla
         for (let seat of seats) {
             const insertTicketQuery = `
                 INSERT INTO ticket (user_id, function_id, seat, price, invoice_id)
@@ -78,10 +76,8 @@ router.post('/buy-ticket', async (req, res) => {
             await pool.query(insertTicketQuery, [user_id, function_id, seat, price_per_ticket, invoice_id]);
         }
 
-        // Enviar correo de confirmación al usuario
         await sendConfirmationEmail(userEmail, invoice_id, total_price, seats, function_id);
 
-        // Respuesta exitosa
         res.status(201).json({
             message: 'Tickets and invoice created successfully',
             invoice_id,
@@ -94,5 +90,42 @@ router.post('/buy-ticket', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+
+router.get('/', async (req, res) => {
+  try {
+      const query = `
+          SELECT 
+              i.id AS invoice_id,
+              u.id AS user_id,
+              u.first_name || ' ' || u.last_name AS user_name,
+              t.price AS price_per_ticket,
+              i.total AS total_price,
+              i.date_invoice AS purchase_date,
+              ARRAY_AGG(t.seat) AS seats,
+              m.title AS movie_title,
+              mf.date_function AS function_date,
+              mf.time_function AS function_time
+          FROM invoice i
+          JOIN ticket t ON t.invoice_id = i.id
+          JOIN users u ON u.id = t.user_id
+          JOIN movie_function mf ON t.function_id = mf.id
+          JOIN movies m ON mf.movie_id = m.id
+          GROUP BY 
+              i.id, u.id, u.first_name, u.last_name, t.price, i.total, i.date_invoice, m.title, mf.date_function, mf.time_function
+          ORDER BY i.date_invoice DESC;
+      `;
+
+      const result = await pool.query(query);
+
+      res.status(200).json({
+          invoices: result.rows
+      });
+  } catch (error) {
+      console.error('Error fetching invoices:', error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
 
 module.exports = router;

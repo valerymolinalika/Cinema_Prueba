@@ -1,0 +1,59 @@
+<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-white uppercase bg-customBlue dark:bg-customDarkgrey">
+            <tr>
+                <th scope="col" class="px-6 py-3">ID</th>
+                <th scope="col" class="px-6 py-3">First Name</th>
+                <th scope="col" class="px-6 py-3">Last Name</th>
+                <th scope="col" class="px-6 py-3">Email</th>
+                <th scope="col" class="px-6 py-3">Phone</th>
+                <th scope="col" class="px-6 py-3">Available</th>
+                <th scope="col" class="px-6 py-3">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr
+                *ngFor="let user of users()"
+                class="odd:bg-customGrey even:bg-white border-b dark:border-gray-700">
+                <td class="px-6 py-4">{{ user.id }}</td>
+                <td class="px-6 py-4">{{ user.first_name }}</td>
+                <td class="px-6 py-4">{{ user.last_name }}</td>
+                <td class="px-6 py-4">{{ user.email }}</td>
+                <td class="px-6 py-4">{{ user.phone }}</td>
+                <td class="px-6 py-4">
+                    <span
+                        class="px-2 py-1 rounded-full text-xs font-semibold cursor-pointer"
+                        [ngClass]="{
+                            'bg-green-300 text-customBlue': user.available,
+                            'bg-customRed text-white': !user.available
+                        }"
+                        (click)="toggleAvailability(user)">
+                        {{ user.available ? 'Yes' : 'No' }}
+                    </span>
+                </td>
+                <td class="px-6 py-4">
+                    <button
+                        class="px-4 py-2 text-white bg-customBlue hover:bg-customDarkgrey rounded">
+                        Edit
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div *ngIf="showModal()" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div class="bg-white p-6 rounded shadow-lg">
+        <h2 class="text-lg font-bold mb-4">Confirm Change</h2>
+        <p>Are you sure you want to change availability for {{ selectedUser()?.first_name }}?</p>
+        <div class="mt-4 flex justify-end">
+            <button
+                class="px-4 py-2 mr-2 text-white bg-red-500 hover:bg-red-700 rounded"
+                (click)="closeModal()">Cancel</button>
+            <button
+                class="px-4 py-2 text-white bg-green-500 hover:bg-green-700 rounded"
+                (click)="confirmChangeAvailability()">Confirm</button>
+        </div>
+    </div>
+</div>

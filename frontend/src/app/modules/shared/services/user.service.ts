@@ -6,7 +6,7 @@ import { User } from '../models/users.models';
   providedIn: 'root',
 })
 export class UserService {
-  private apiUrl = 'http://localhost:3001'; // Ajusta según corresponda
+  private apiUrl = 'http://localhost:3001'; 
 
   constructor() {}
 
@@ -16,11 +16,15 @@ export class UserService {
   registerActive = signal(false);
   public registerActiveValue = computed(() => this.registerActive());
 
-  private currentUser = signal<User | null>(null); // Estado del usuario actual
+  currentUser = signal<User | null>(null); 
   public currentUserValue = computed(() => this.currentUser());
 
   changeLoginActive() {
     this.loginActive.set(!this.loginActive());
+  }
+
+  changeCurrentUser(user: User) {
+      this.currentUser.set(user);
   }
 
   getLoginActive() {
@@ -36,6 +40,7 @@ export class UserService {
   }
 
   async loginUser(email: string, user_password: string): Promise<User> {
+    console.log('Logging in user:', email);
     try {
       const response = await axios.post(`${this.apiUrl}/users/login`, {
         email,
@@ -43,7 +48,6 @@ export class UserService {
       });
   
       console.log('User logged in:', response.data);
-  
       const user: User = response.data;
       if (user) {
         this.currentUser.set(user); 
@@ -51,12 +55,13 @@ export class UserService {
         throw new Error('Invalid user data received');
       }
   
-      this.changeLoginActive(); 
       return user;
   
     } catch (error: any) {
       console.error('Error during login:', error.response?.data || error.message);
       throw new Error(error.response?.data || 'Error during login');
+    }finally{
+      console.log('holaaaaaaa');
     }
   }
   
@@ -79,4 +84,37 @@ export class UserService {
   logoutUser() {
     this.currentUser.set(null);
   }
+
+   async getUsers(): Promise<User[]> {
+    try {
+      const response = await axios.get(`${this.apiUrl}/users`);
+      return response.data;  
+    } catch (error) {
+      console.error('Error getting the users:', error);
+      throw error;  
+    }
+   }
+
+   async updateUserAvailability(id: number, available: boolean): Promise<string> {
+    try {
+      const response = await axios.put(`${this.apiUrl}/users/available`, {
+        id,
+        available,
+      });
+      console.log('User availability updated:', response.data);
+      return response.data; // Retorna el mensaje de éxito
+    } catch (error: any) {
+      console.error(
+        'Error while updating user availability:',
+        error.response?.data || error.message
+      );
+      throw new Error(
+        error.response?.data || 'Error while updating user availability'
+      );
+    }
+  }
+
+
+
+
 }

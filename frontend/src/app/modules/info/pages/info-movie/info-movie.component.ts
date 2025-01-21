@@ -35,6 +35,7 @@ export class InfoMovieComponent {
   dates: string[] = [];  // Aquí se almacenarán las fechas de las funciones
   functions: any[] = []; // Aquí se almacenarán las funciones para la fecha seleccionada
   selectedDate: string = ''; // Fecha seleccionada
+  selectedHour: string=''; //Hora seleccionada
 
   constructor(private route: ActivatedRoute) {}
 
@@ -76,6 +77,20 @@ export class InfoMovieComponent {
     } catch (error) {
       console.error('Error fetching functions for selected date:', error);
     }
+  }
+  async onHourSelected(hour: string) {
+    this.selectedHour= hour; // Actualizamos la hora seleccionada
+    // try {
+    //   const functions = await this.movieService.getFunctionsByDate(Number(this.movie().id), date);
+    //   // Formatear las horas de las funciones
+    //   this.functions = functions.map(func => ({
+    //     ...func,
+    //     time_function: func.time_function.substring(0, 5) // Tomar solo "HH:mm"
+    //   }));
+    //   console.log('Functions for selected date:', this.functions);
+    // } catch (error) {
+    //   console.error('Error fetching functions for selected date:', error);
+    // }
   }
   
 }

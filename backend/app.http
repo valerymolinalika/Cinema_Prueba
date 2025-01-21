@@ -21,7 +21,7 @@ put http://localhost:3001/users/available
 Content-Type: application/json
 
 {
-    "id": "123421233",
+    "id": 123421233,
     "available":"TRUE"
 }
 
@@ -59,10 +59,10 @@ post http://localhost:3001/movies/add
 Content-Type: application/json
 
 {
-    "title": "Mufasa",
+    "title": "Baby girl",
     "synopsis": "A skilled thief is offered a chance to have his past crimes forgiven if he can successfully perform inception on a target's mind.",
     "rating": "PG-13",
-    "image_url": "https://m.media-amazon.com/images/M/MV5BMDM0YTZlMDgtMzlmOS00ODg2LTljYjYtZTU5NWY3OWQ1MzZkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyrqht3oVnDQ4-rJBUdMbxTVTh3Zd0yJKwIw&s",
     "available":"TRUE", 
     "genre": "sci-fi",
     "administrator_id": 123456789
@@ -113,3 +113,7 @@ Content-Type: application/json
   "seats": ["A3"],
   "price_per_ticket": 10000
 }
+
+###Get all invoices
+get http://localhost:3001/invoice
+Content-Type: application/json
