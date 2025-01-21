@@ -33,9 +33,9 @@ export class HomeComponent {
   private async getMovies() {
     try {
       const movies = await this.movieService.getMovies();
-      const availableMovies = movies.filter((movie) => movie.available); // Filtrar películas disponibles
-      this.movies.set(availableMovies); // Almacenar solo las películas disponibles
-      this.filteredMovies.set(availableMovies); // Inicializar con las películas disponibles
+      const availableMovies = movies.filter((movie) => movie.available);
+      this.movies.set(availableMovies);
+      this.filteredMovies.set(availableMovies); 
       console.log('Available Movies:', availableMovies);
     } catch (error) {
       console.error('Error fetching movies:', error);

@@ -20,11 +20,13 @@ export class HeaderComponent {
   private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
 
-  ngOnInit() {
-    if (this.userService.getLoginActive()) {
-      this.userService.changeLoginActive()
-    }
-  }
+  // ngOnInit() {
+  //   // this.userService.loginActive.set(false)
+  //   // if (this.userService.getLoginActive()) {
+  //   //   this.userService.changeLoginActive()
+  //   // }
+  // }
+ 
 
   userExists = computed(() => {
     const user = this.userService.getCurrentUser();
@@ -41,7 +43,7 @@ export class HeaderComponent {
   constructor() {
     effect(() => {
       this.showLogin = this.userService.getLoginActive();
-      // this.cdr.detectChanges();
+      //this.cdr.detectChanges();
     });
 
     effect(() => {

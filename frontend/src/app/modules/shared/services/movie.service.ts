@@ -49,7 +49,7 @@ export class MovieService {
       console.log('Dates retrieved:', response.data.dates);
       return response.data.dates.map((dateObj: { date_function: string }) => {
         const date = new Date(dateObj.date_function);
-        return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });  // Formatear la fecha como '12 ene'
+        return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });  
       });
     } catch (error) {
       console.error('Error getting the dates:', error);
@@ -60,8 +60,6 @@ export class MovieService {
   async getFunctionsByDate(movieId: number, date: string): Promise<MovieFunction[]> {
     try {
       console.log('Getting functions for movie:', movieId, 'and date:', date);
-
-      // Convertir la fecha en formato '22 ene' a formato '2025-01-22'
       const monthMap: { [key: string]: string } = {
         'ene': '01',
         'feb': '02',
@@ -123,7 +121,7 @@ export class MovieService {
     try {
       const response = await axios.post(`${this.apiUrl}/movie_function/add`, movieFunction);
       console.log('Movie function created:', response.data);
-      return response.data.function; // Devuelve la función de película creada
+      return response.data.function; 
     } catch (error) {
       console.error('Error creating movie function:', error);
       throw error;

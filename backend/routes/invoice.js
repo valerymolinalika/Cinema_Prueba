@@ -5,7 +5,7 @@ dotenv.config();
 const nodemailer = require("nodemailer");
 const { pool } = require('./db_pool_connect');
 
-// Configuración del transporter de nodemailer
+// Nodemailer transporter configuration for sending emails
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-
+// Function to send a confirmation email after a successful purchase
 async function sendConfirmationEmail(userEmail, invoice_id, total_price, seats, function_id) {
   try {
     const info = await transporter.sendMail({
@@ -37,7 +37,7 @@ async function sendConfirmationEmail(userEmail, invoice_id, total_price, seats, 
   }
 }
 
-// Ruta para comprar un ticket y generar una factura
+// Route to handle ticket purchase and invoice generation
 router.post('/buy-ticket', async (req, res) => {
     const { user_id, function_id, seats, price_per_ticket } = req.body;
 
@@ -45,11 +45,10 @@ router.post('/buy-ticket', async (req, res) => {
         return res.status(400).send('Missing required fields: user_id, function_id, seats, price_per_ticket');
     }
 
-    const current_date = new Date(); // Obtener la fecha actual
+    const current_date = new Date(); // Get the current date
     const total_price = price_per_ticket * seats.length; 
 
     try {
-        // Obtener el correo del usuario a partir del user_id
         const userQuery = `SELECT email FROM users WHERE id = $1`;
         const userResult = await pool.query(userQuery, [user_id]);
         
@@ -91,7 +90,7 @@ router.post('/buy-ticket', async (req, res) => {
     }
 });
 
-
+// Route to fetch all invoices with detailed information
 router.get('/', async (req, res) => {
   try {
       const query = `
@@ -126,6 +125,5 @@ router.get('/', async (req, res) => {
       res.status(500).send('Internal Server Error');
   }
 });
-
 
 module.exports = router;

@@ -9,6 +9,7 @@ import { CommonModule, DOCUMENT } from '@angular/common';
     providedIn: 'root',
 })
 export class UserService {
+
     private apiUrl = 'http://localhost:3001';
 
     constructor(@Inject(DOCUMENT) private document: Document) {
@@ -45,7 +46,6 @@ export class UserService {
 
     changeCurrentUser(user: User | Administrator) {
         console.log('Setting current user in service:', user);
-        // por si acaso
         if (!user.first_name || !user.email) {
           console.error('Invalid user data:', user);
           return;
@@ -95,7 +95,7 @@ export class UserService {
                     user_password: userData.user_password,
                     isAdmin: isAdmin,
                 };
-                this.currentUser.set(admin); // Guarda al administrador como el usuario actual
+                this.currentUser.set(admin); 
                 console.log(this.isAdministrator());
                 return admin;
             } else {
@@ -109,7 +109,7 @@ export class UserService {
                     user_password: userData.user_password,
                     isAdmin: isAdmin,
                 };
-                this.currentUser.set(user); // Guarda al usuario como el usuario actual
+                this.currentUser.set(user); 
                 return user;
             }
         } catch (error: any) {
@@ -160,7 +160,7 @@ export class UserService {
                 available,
             });
             console.log('User availability updated:', response.data);
-            return response.data; // Retorna el mensaje de éxito
+            return response.data; 
         } catch (error: any) {
             console.error(
                 'Error while updating user availability:',

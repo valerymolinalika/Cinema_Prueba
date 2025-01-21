@@ -12,11 +12,14 @@ import { Router } from '@angular/router';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
+
   private userService = inject(UserService);
   private router = inject(Router);
+
   setLogin() {
     this.userService.changeLoginActive();
   }
+
   setRegister() {
     this.userService.changeRegisterActive();
   }
@@ -41,16 +44,19 @@ export class LoginComponent {
         this.userService.changeCurrentUser(user)
         console.log("currentUser", this.userService.getCurrentUser())
         console.log('Login successful!');
-        this.userService.changeIsAdministrator(user.isAdmin)
         this.userService.changeLoginActive();
+        this.userService.changeIsAdministrator(user.isAdmin)
+        // this.userService.loginActive.set(false)
+        console.log("isLoginActive", this.userService.getLoginActive())
         if (user.isAdmin) {
+          this.userService.changeLoginActive();
           this.router.navigate(['/admin']);
         }
 
       })
       .catch((error) => {
         console.error('Login failed:', error.message);
-       });
+      });
   }
 
 

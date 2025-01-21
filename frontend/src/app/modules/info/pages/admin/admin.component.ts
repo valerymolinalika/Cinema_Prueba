@@ -15,6 +15,10 @@ import { UserService } from '../../../shared/services/user.service';
 
 export class AdminComponent {
 
+  // ngOnInit() {
+  //   this.userService.loginActive.set(false)
+  // }
+  
   userService = inject(UserService);
 
   isAdmin = computed(() => {

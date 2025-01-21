@@ -118,7 +118,6 @@ export class CineComponent {
   }
 
   // Payment
-  // Payment
 openPaymentModal(): void {
   if (!this.userExists()) {
     this.showLogginError.set(true);

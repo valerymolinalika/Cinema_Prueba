@@ -9,8 +9,7 @@ var router = express.Router();
 
 const { pool, connect } = require('./db_pool_connect');
 
-
-//get all movies
+// Route to get all movies
 router.get('/', async function (req, res, next) {
     try {
         const getMoviesQuery = `
@@ -25,7 +24,7 @@ router.get('/', async function (req, res, next) {
     }
 });
 
-//get movie by id
+// Route to get a movie by its ID
 router.get('/:id', async function (req, res, next) {
     try {
         const { id } = req.params;
@@ -47,7 +46,7 @@ router.get('/:id', async function (req, res, next) {
     }
 });
 
-// Ruta para agregar una nueva película
+// Route to add a new movie
 router.post('/add', async function (req, res, next) {
     try {
         const { title, synopsis, rating, image_url, available, genre, administrator_id } = req.body;
@@ -65,7 +64,7 @@ router.post('/add', async function (req, res, next) {
 
         const imageResponse = await axios.get(image_url, { responseType: 'stream' });
 
-        const fileName = `images/${Date.now()}-${title}.jpg`; // Nombre único para cada archivo
+        const fileName = `images/${Date.now()}-${title}.jpg`; 
         const s3Result = await uploadToS3(imageResponse.data, fileName);
 
         const insertMovieQuery = `
@@ -85,11 +84,11 @@ router.post('/add', async function (req, res, next) {
     }
 });
 
-// Ruta para editar una película
+// Route to edit an existing movie
 router.put('/edit/:id', async function (req, res, next) {
     try {
-        const { id } = req.params; // ID de la película a editar
-        const { title, synopsis, rating, image_url,available, genre } = req.body;
+        const { id } = req.params;
+        const { title, synopsis, rating, image_url, available, genre } = req.body;
 
         const movieCheckQuery = `SELECT * FROM movies WHERE id = $1`;
         const movieResult = await pool.query(movieCheckQuery, [id]);
@@ -98,7 +97,7 @@ router.put('/edit/:id', async function (req, res, next) {
             return res.status(404).send('Movie not found');
         }
 
-        let updatedImageUrl = movieResult.rows[0].image_url; // Mantener la URL actual si no se pasa una nueva
+        let updatedImageUrl = movieResult.rows[0].image_url; 
 
         if (image_url) {
             const imageResponse = await axios.get(image_url, { responseType: 'stream' });
@@ -141,8 +140,7 @@ router.put('/edit/:id', async function (req, res, next) {
     }
 });
 
-
-// Ruta para actualizar el estado de 'available' de una pelicula
+// Route to update the 'available' status of a movie
 router.put('/available', async function (req, res, next) {
     try {
         const { id, available } = req.body;

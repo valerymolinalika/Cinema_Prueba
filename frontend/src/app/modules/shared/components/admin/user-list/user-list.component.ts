@@ -10,7 +10,9 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.css',
 })
+
 export class UserListComponent {
+
   userService = inject(UserService);
   users = signal<User[]>([]);
   selectedUser = signal<User | null>(null); 
@@ -43,7 +45,7 @@ export class UserListComponent {
 
   async toggleAvailability(user: User) {
     this.selectedUser.set(user);
-    this.showModal.set(true); // Mostrar el modal
+    this.showModal.set(true); 
   }
 
   async confirmChangeAvailability() {
@@ -52,7 +54,7 @@ export class UserListComponent {
       try {
         const updatedAvailability = !user.available; 
         await this.userService.updateUserAvailability(user.id, updatedAvailability);
-        this.getUsers(); // Actualizar lista de usuarios
+        this.getUsers(); 
         this.closeModal();
       } catch (error) {
         console.error('Error updating availability:', error);
@@ -61,7 +63,7 @@ export class UserListComponent {
   }
 
   closeModal() {
-    this.showModal.set(false); // Ocultar modal
-    this.selectedUser.set(null); // Reiniciar usuario seleccionado
+    this.showModal.set(false);
+    this.selectedUser.set(null); 
   }
 }

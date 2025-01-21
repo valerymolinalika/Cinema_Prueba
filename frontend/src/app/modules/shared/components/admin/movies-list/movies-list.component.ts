@@ -19,15 +19,18 @@ export class MoviesListComponent {
   private userSer = inject(UserService)
   
   private cdr = inject(ChangeDetectorRef);
+
   currentUser = signal<User | null>(null);
   movieService = inject(MovieService);
   movies = signal<Movie[]>([]);
-  availableMovies: Movie[] = [];
   selectedMovie = signal<Movie | null>(null);
   showModal = signal(false);
   showCreateMovieFunctionModal = signal(false);
   showCreateMovieModal = signal(false);
-  showEditMovieModalSignal = signal(false); 
+  showEditMovieModalSignal = signal(false);
+  filteredMovies = signal<Movie[]>([]);
+
+  availableMovies: Movie[] = [];
   newMovieFunction: MovieFunction = {
     id: 0,
     movie_id: 0,
@@ -36,7 +39,7 @@ export class MoviesListComponent {
     room_number: 0,
     available_seats: []
   };
-  availableSeatsInput: string = '';
+  
   newMovie: Movie = {
     title: '',
     synopsis: '',
@@ -46,8 +49,10 @@ export class MoviesListComponent {
     genre: '',
     administrator_id: this.userSer.currentUserValue()?.id || 0
   }
+
   searchQuery: string = '';
-  filteredMovies = signal<Movie[]>([]);
+  availableSeatsInput: string = '';
+  
 
   constructor() {
     effect(()=>{
@@ -191,9 +196,9 @@ export class MoviesListComponent {
     if (movie && movie.id) {
       
       try {
-        await this.movieService.editMovie(movie.id, movie); // Ensure `updateMovie` is implemented in your service
-        this.getMovies(); // Refresh the movies list
-        this.closeEditMovieModal(); // Close modal after successful edit
+        await this.movieService.editMovie(movie.id, movie); 
+        this.getMovies(); 
+        this.closeEditMovieModal(); 
       } catch (error) {
         console.error('Error updating movie:', error);
       }

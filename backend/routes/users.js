@@ -6,6 +6,7 @@ var router = express.Router();
 
 const { pool, connect } = require('./db_pool_connect');
 
+//Registers a new user by adding their information to the database after validating inputs and hashing the password.
 router.post('/register', async function (req, res, next) {
     try {
         const { id, first_name, last_name, email, phone, available, user_password } = req.body;
@@ -37,9 +38,7 @@ router.post('/register', async function (req, res, next) {
     }
 });
 
-
-
-// Ruta para obtener todos los usuarios excepto la contraseña
+// Fetches all users from the database excluding their passwords.
 router.get('/', async function (req, res, next) {
     try {
         const getUsersQuery = `
@@ -54,10 +53,10 @@ router.get('/', async function (req, res, next) {
     }
 });
 
-// Ruta para editar información de un usuario
+// Updates a user's information based on their ID, allowing partial updates for fields.
 router.put('/edit/:id', async function (req, res, next) {
     try {
-        const { id } = req.params; // ID del usuario a editar
+        const { id } = req.params; 
         const { first_name, last_name, email, phone, available } = req.body;
 
         const userCheckQuery = `SELECT * FROM users WHERE id = $1`;
@@ -98,7 +97,7 @@ router.put('/edit/:id', async function (req, res, next) {
     }
 });
 
-// Ruta para actualizar el estado de 'available' de un usuario
+//Updates the availability status of a user by their ID.
 router.put('/available', async function (req, res, next) {
     try {
         const { id, available } = req.body;
@@ -127,7 +126,7 @@ router.put('/available', async function (req, res, next) {
 });
 
 
-// Ruta para validar un usuario con email y contraseña, verificando el estado de available
+ //Validates a user's credentials (email and password) and checks if they are available to log in.
 router.post('/login', async function (req, res, next) {
     try {
         const { email, user_password } = req.body;
@@ -135,8 +134,9 @@ router.post('/login', async function (req, res, next) {
         if (!email || !user_password) {
             return res.status(400).send('Missing required fields: email and user_password');
         }
+
         let isAdmin = false;
-        let getUserQuery = ``
+        let getUserQuery = ``;
         if (email === 'admin@gmail.com') {
             getUserQuery = `
             SELECT id, first_name, last_name, email, admin_password
@@ -156,10 +156,12 @@ router.post('/login', async function (req, res, next) {
         if (result.rows.length === 0) {
             return res.status(404).send('User not found');
         }
+
         const user = result.rows[0];
         if (!user.available && !isAdmin) {
             return res.status(403).send('User is not available to log in');
         }
+
         let isPasswordValid = false;
 
         if (isAdmin) {
@@ -179,7 +181,5 @@ router.post('/login', async function (req, res, next) {
         res.status(500).send('Internal Server Error');
     }
 });
-
-
 
 module.exports = router;
